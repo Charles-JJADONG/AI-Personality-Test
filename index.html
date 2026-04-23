@@ -3,1475 +3,2012 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>나의 AI 성향 진단</title>
+<title>나의 AI 직업 유형 진단</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,800&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --samsung-blue: #1428A0;
-    --samsung-blue-light: #2E4BC7;
-    --samsung-blue-deep: #0A1854;
-    --ink: #0B1220;
-    --ink-soft: #3A4256;
-    --gray-50: #F7F8FA;
-    --gray-100: #EEF1F6;
-    --gray-200: #DCE1EA;
-    --gray-400: #9AA3B2;
-    --accent: #00C2FF;
-    --warn: #FF6B35;
-    --neutral: #8B93A8;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  html, body {
-    font-family: 'IBM Plex Sans KR', -apple-system, sans-serif;
-    background: var(--gray-50);
-    color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
-    line-height: 1.5;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(circle at 15% 10%, rgba(20, 40, 160, 0.06), transparent 40%),
-      radial-gradient(circle at 85% 90%, rgba(0, 194, 255, 0.05), transparent 45%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .app {
-    position: relative;
-    z-index: 1;
-    max-width: 520px;
-    margin: 0 auto;
-    min-height: 100vh;
-    padding: 0 20px;
-  }
-
-  .screen { display: none; animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .screen.active { display: block; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ============ INTRO ============ */
-  .intro { padding: 56px 0 40px; text-align: left; }
-
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    color: var(--samsung-blue);
-    text-transform: uppercase;
-    padding: 6px 12px;
-    border: 1px solid var(--gray-200);
-    border-radius: 100px;
-    background: white;
-    margin-bottom: 28px;
-  }
-
-  .brand .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--samsung-blue);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(1.3); }
-  }
-
-  .intro h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 300;
-    font-size: clamp(36px, 9vw, 48px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    margin-bottom: 20px;
-  }
-
-  .intro h1 em { font-style: italic; font-weight: 600; color: var(--samsung-blue); }
-
-  .intro .lede {
-    font-size: 15px;
-    color: var(--ink-soft);
-    line-height: 1.65;
-    margin-bottom: 28px;
-    max-width: 440px;
-  }
-
-  .safe-note {
-    background: rgba(20, 40, 160, 0.04);
-    border-left: 3px solid var(--samsung-blue);
-    padding: 14px 16px;
-    margin-bottom: 36px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--ink-soft);
-    border-radius: 0 4px 4px 0;
-  }
-
-  .safe-note strong { color: var(--samsung-blue); font-weight: 600; }
-
-  .meta-row {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 40px;
-    padding: 20px 0;
-    border-top: 1px solid var(--gray-200);
-    border-bottom: 1px solid var(--gray-200);
-  }
-
-  .meta-item { flex: 1; }
-
-  .meta-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .meta-value { font-size: 16px; font-weight: 600; color: var(--ink); }
-
-  .start-btn {
-    display: block;
-    width: 100%;
-    padding: 18px;
-    background: var(--samsung-blue);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-family: 'IBM Plex Sans KR', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .start-btn::after {
-    content: "→";
-    margin-left: 8px;
-    display: inline-block;
-    transition: transform 0.3s ease;
-  }
-
-  .start-btn:hover { background: var(--samsung-blue-deep); }
-  .start-btn:hover::after { transform: translateX(4px); }
-  .start-btn:active { transform: scale(0.98); }
-
-  /* ============ QUESTIONS ============ */
-  .question-screen { padding: 32px 0 40px; }
-
-  .progress-wrap { margin-bottom: 32px; }
-
-  .progress-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 8px;
-  }
-
-  .progress-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-  }
-
-  .progress-count { font-family: 'Fraunces', serif; font-size: 14px; color: var(--ink); }
-  .progress-count strong { font-size: 22px; font-weight: 600; color: var(--samsung-blue); }
-
-  .progress-bar {
-    height: 2px;
-    background: var(--gray-200);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--samsung-blue);
-    width: 0%;
-    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .question-card { margin-top: 32px; }
-
-  .q-tag {
-    display: inline-block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--samsung-blue);
-    text-transform: uppercase;
-    padding: 4px 10px;
-    background: rgba(20, 40, 160, 0.08);
-    border-radius: 3px;
-    margin-bottom: 16px;
-  }
-
-  .q-text {
-    font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: clamp(22px, 5.5vw, 26px);
-    line-height: 1.35;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    margin-bottom: 32px;
-  }
-
-  .options { display: flex; flex-direction: column; gap: 10px; }
-
-  .option {
-    padding: 18px 20px;
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-    font-family: inherit;
-    font-size: 15px;
-    color: var(--ink);
-    line-height: 1.5;
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .option-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--gray-400);
-    flex-shrink: 0;
-    padding-top: 2px;
-    transition: color 0.2s ease;
-  }
-
-  .option-text { flex: 1; }
-
-  .option:hover {
-    border-color: var(--samsung-blue);
-    background: #FBFCFE;
-    transform: translateX(2px);
-  }
-
-  .option:hover .option-num { color: var(--samsung-blue); }
-  .option:active { transform: scale(0.99); }
-
-  .option.selected {
-    border-color: var(--samsung-blue);
-    background: var(--samsung-blue);
-    color: white;
-  }
-
-  .option.selected .option-num { color: rgba(255, 255, 255, 0.7); }
-
-  /* 중립 옵션 — 외형 통일, 선택 시 회색으로만 구분 */
-  .option.neutral.selected { background: var(--ink-soft); border-color: var(--ink-soft); }
-
-  /* ============ RESULT ============ */
-  .result-screen { padding: 40px 0 60px; }
-
-  .result-header { text-align: center; margin-bottom: 32px; }
-
-  .result-tag {
-    display: inline-block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
-
-  /* 캐릭터 비주얼 */
-  .character-visual {
-    width: 180px;
-    height: 230px;
-    margin: 0 auto 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    animation: charFloat 3s ease-in-out infinite;
-  }
-
-  @keyframes charFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-
-  .character-visual svg { width: 100%; height: 100%; }
-
-  .result-code {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(36px, 10vw, 48px);
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, var(--samsung-blue) 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .result-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-style: italic;
-    font-size: clamp(24px, 6vw, 30px);
-    line-height: 1.2;
-    color: var(--ink);
-    margin-bottom: 12px;
-  }
-
-  .result-tagline {
-    font-size: 14px;
-    color: var(--ink-soft);
-    max-width: 380px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-
-  /* 캐릭터 스탯 카드 */
-  .stat-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: center;
-    margin-top: 20px;
-  }
-
-  .stat-chip {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    padding: 5px 10px;
-    border: 1px solid var(--gray-200);
-    border-radius: 100px;
-    color: var(--ink-soft);
-    background: white;
-    text-transform: uppercase;
-  }
-
-  .stat-chip.primary {
-    background: var(--samsung-blue);
-    color: white;
-    border-color: var(--samsung-blue);
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--gray-200);
-    margin: 36px 0;
-    position: relative;
-  }
-
-  .divider::after {
-    content: "◆";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--gray-50);
-    padding: 0 12px;
-    color: var(--samsung-blue);
-    font-size: 10px;
-  }
-
-  .section-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  .result-desc {
-    font-size: 15px;
-    line-height: 1.75;
-    color: var(--ink-soft);
-    margin-bottom: 32px;
-  }
-
-  .result-desc strong { color: var(--ink); font-weight: 600; }
-
-  .trait-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 32px;
-  }
-
-  .trait-item {
-    padding: 14px;
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: 6px;
-  }
-
-  .trait-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .trait-value {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-    line-height: 1.4;
-  }
-
-  .axis-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin-bottom: 32px;
-  }
-
-  .axis-bar { display: grid; grid-template-columns: 1fr; gap: 6px; }
-
-  .axis-bar-labels { display: flex; justify-content: space-between; font-size: 12px; }
-
-  .axis-bar-label {
-    color: var(--gray-400);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .axis-bar-label.active { color: var(--samsung-blue); font-weight: 600; }
-
-  .axis-bar-track {
-    height: 4px;
-    background: var(--gray-200);
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .axis-bar-fill {
-    position: absolute;
-    height: 100%;
-    background: var(--samsung-blue);
-    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    border-radius: 4px;
-  }
-
-  .next-step {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-left: 3px solid var(--samsung-blue);
-    padding: 20px 22px;
-    margin-bottom: 24px;
-  }
-
-  .next-step-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--samsung-blue);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .next-step-title {
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 8px;
-    line-height: 1.35;
-  }
-
-  .next-step-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
-
-  /* 리더 섹션 */
-  .leader-box {
-    background: rgba(20, 40, 160, 0.04);
-    border: 1px dashed var(--samsung-blue);
-    border-radius: 6px;
-    padding: 18px 20px;
-    margin-bottom: 24px;
-  }
-
-  .leader-header {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--samsung-blue);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .leader-text {
-    font-size: 13.5px;
-    line-height: 1.7;
-    color: var(--ink-soft);
-  }
-
-  /* 통계 패널 */
-  .stats-panel {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 32px;
-  }
-
-  .stats-loading {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--gray-400);
-    font-size: 13px;
-    padding: 8px 0;
-  }
-
-  .stats-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--gray-200);
-    border-top-color: var(--samsung-blue);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .stats-my-rank {
-    font-size: 13px;
-    color: var(--ink-soft);
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    background: rgba(20,40,160,0.05);
-    border-radius: 4px;
-    border-left: 3px solid var(--samsung-blue);
-    line-height: 1.55;
-  }
-
-  .stats-my-rank strong { color: var(--samsung-blue); }
-
-  .stats-bar-row {
-    display: grid;
-    grid-template-columns: 90px 1fr 36px;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .stats-bar-row.is-me .stats-type-label { color: var(--samsung-blue); font-weight: 600; }
-
-  .stats-type-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .stats-bar-track {
-    height: 6px;
-    background: var(--gray-100);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .stats-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    background: var(--gray-200);
-    transition: width 0.7s cubic-bezier(0.2,0.8,0.2,1);
-  }
-
-  .stats-bar-row.is-me .stats-bar-fill { background: var(--samsung-blue); }
-
-  .stats-bar-count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--gray-400);
-    text-align: right;
-  }
-
-  .stats-bar-row.is-me .stats-bar-count { color: var(--samsung-blue); font-weight: 600; }
-
-  .actions { display: flex; gap: 10px; margin-top: 28px; }
-
-  .btn-secondary {
-    flex: 1;
-    padding: 16px;
-    background: white;
-    color: var(--ink);
-    border: 1px solid var(--gray-200);
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-secondary:hover { border-color: var(--samsung-blue); color: var(--samsung-blue); }
-
-  .btn-primary {
-    flex: 1;
-    padding: 16px;
-    background: var(--samsung-blue);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-primary:hover { background: var(--samsung-blue-deep); }
-
-  .footer-note {
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    margin-top: 32px;
-    padding-bottom: 20px;
-  }
-
-  @media (max-width: 380px) {
-    .app { padding: 0 16px; }
-    .meta-row { gap: 12px; }
-    .character-visual { width: 140px; height: 140px; }
-  }
+:root {
+  --bg:       #080C14;
+  --bg2:      #0E1420;
+  --bg3:      #141C2C;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.13);
+  --text:     #E8EDF5;
+  --text2:    #8A97AE;
+  --text3:    #4A5568;
+  --cyan:     #00E5FF;
+  --cyan2:    #00B8D4;
+  --gold:     #FFD166;
+  --green:    #06D6A0;
+  --pink:     #FF6B9D;
+  --orange:   #FF9F1C;
+  --purple:   #C77DFF;
+  --glow-c:   0 0 20px rgba(0,229,255,0.35);
+  --glow-g:   0 0 20px rgba(255,209,102,0.35);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── 노이즈 그레인 오버레이 ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* ── 배경 광원 ── */
+.bg-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 20%, rgba(0,229,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 85% 80%, rgba(199,125,255,0.05) 0%, transparent 60%);
+}
+
+.app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+
+/* ════════════════════════════════════
+   SCREENS
+════════════════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; animation: screenIn 0.45s cubic-bezier(0.16,1,0.3,1); }
+
+@keyframes screenIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ════════════════════════════════════
+   INTRO
+════════════════════════════════════ */
+.intro-wrap { padding: 48px 24px 60px; }
+
+.intro-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 32px;
+}
+
+.intro-badge .ping {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cyan);
+  animation: ping 1.8s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+@keyframes ping {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.3; transform:scale(1.5); }
+}
+
+.intro-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 12px;
+}
+
+.intro-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(38px, 10vw, 52px);
+  line-height: 1.05; letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.intro-title .line1 { display: block; color: var(--text); }
+.intro-title .line2 { display: block; color: var(--cyan); text-shadow: var(--glow-c); }
+
+.intro-sub {
+  font-size: 14px; color: var(--text2); line-height: 1.7;
+  margin-bottom: 36px; max-width: 360px;
+}
+
+/* 인트로 통계 카드 */
+.intro-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 40px;
+}
+
+.istat {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 16px 12px; text-align: center;
+}
+
+.istat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px; font-weight: 700;
+  color: var(--cyan); display: block; margin-bottom: 4px;
+}
+
+.istat-label {
+  font-size: 10px; color: var(--text3);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+/* 축 프리뷰 */
+.axis-preview {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; margin-bottom: 36px;
+}
+
+.axis-preview-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; color: var(--text3);
+  text-transform: uppercase; margin-bottom: 14px;
+}
+
+.axis-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.axis-row:last-child { border-bottom: none; }
+
+.axis-row-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+
+.axis-name {
+  font-size: 12px; font-weight: 600; color: var(--text);
+}
+
+.axis-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.15em;
+  color: var(--cyan);
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.18);
+  padding: 2px 7px; border-radius: 4px;
+}
+
+.axis-split {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border2);
+}
+
+.axis-split-left {
+  background: var(--bg3);
+  padding: 9px 12px;
+}
+
+.axis-split-divider {
+  background: var(--border2);
+}
+
+.axis-split-right {
+  background: var(--bg3);
+  padding: 9px 12px;
+  text-align: right;
+}
+
+.axis-split-en {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text3);
+  letter-spacing: 0.05em; display: block; margin-bottom: 3px;
+}
+
+.axis-split-ko {
+  font-size: 13px; font-weight: 600;
+  color: var(--text2); display: block;
+}
+
+/* CTA 버튼 */
+.cta-btn {
+  display: block; width: 100%;
+  background: var(--cyan);
+  color: var(--bg);
+  border: none; border-radius: 12px;
+  padding: 18px; cursor: pointer;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 17px; letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 30px rgba(0,229,255,0.3);
+  position: relative; overflow: hidden;
+}
+
+.cta-btn::after {
+  content: '→';
+  position: absolute; right: 20px; top: 50%;
+  transform: translateY(-50%);
+  transition: right 0.25s ease;
+}
+
+.cta-btn:hover { background: #33EEFF; box-shadow: 0 0 45px rgba(0,229,255,0.5); }
+.cta-btn:hover::after { right: 14px; }
+.cta-btn:active { transform: scale(0.98); }
+
+/* ════════════════════════════════════
+   QUESTIONS
+════════════════════════════════════ */
+.q-wrap { padding: 28px 20px 60px; }
+
+/* 프로그레스 */
+.q-progress { margin-bottom: 28px; }
+
+.q-progress-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+
+.q-progress-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase;
+}
+
+.q-progress-frac {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--text2);
+}
+
+.q-progress-frac strong { color: var(--cyan); font-size: 20px; }
+
+.q-bar-track {
+  height: 3px; background: var(--bg3); border-radius: 3px; overflow: hidden;
+}
+
+.q-bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--cyan2), var(--cyan));
+  border-radius: 3px; width: 0%;
+  transition: width 0.5s cubic-bezier(0.2,0.8,0.2,1);
+  box-shadow: 0 0 8px rgba(0,229,255,0.6);
+}
+
+/* 질문 카드 */
+.q-card { animation: screenIn 0.35s cubic-bezier(0.16,1,0.3,1); }
+
+.q-axis-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cyan); padding: 4px 10px;
+  background: rgba(0,229,255,0.07);
+  border: 1px solid rgba(0,229,255,0.15);
+  border-radius: 4px; margin-bottom: 20px;
+}
+
+.q-text {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(22px, 5.5vw, 28px);
+  line-height: 1.3; color: var(--text);
+  margin-bottom: 28px; letter-spacing: -0.01em;
+}
+
+/* 선택지 */
+.q-options { display: flex; flex-direction: column; gap: 10px; }
+
+.q-opt {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 18px 18px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left; font-family: inherit;
+  color: var(--text); font-size: 14px; line-height: 1.55;
+  display: flex; align-items: flex-start; gap: 14px;
+  position: relative; overflow: hidden;
+}
+
+.q-opt::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(0,229,255,0.04), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+
+.q-opt:hover { border-color: rgba(0,229,255,0.4); transform: translateX(3px); }
+.q-opt:hover::before { opacity: 1; }
+
+.q-opt-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  flex-shrink: 0; padding-top: 3px; min-width: 20px;
+  transition: color 0.18s;
+}
+
+.q-opt:hover .q-opt-num { color: var(--cyan); }
+
+.q-opt.selected {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.08);
+  box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.04);
+}
+
+.q-opt.selected .q-opt-num { color: var(--cyan); }
+.q-opt.selected::before { opacity: 1; }
+
+/* ════════════════════════════════════
+   RESULT
+════════════════════════════════════ */
+.result-wrap { padding: 0 0 80px; }
+
+/* 히어로 카드 (공유 가능한 영역) */
+.result-hero {
+  background: linear-gradient(160deg, #0D1526 0%, #080C14 100%);
+  border-bottom: 1px solid var(--border2);
+  padding: 48px 24px 40px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+
+/* 배경 격자 패턴 */
+.result-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* 코너 장식 */
+.result-hero::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  box-shadow: 0 0 20px rgba(0,229,255,0.5);
+}
+
+.result-hero-inner { position: relative; z-index: 1; }
+
+.result-series {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.3em; color: var(--text3);
+  text-transform: uppercase; margin-bottom: 24px;
+}
+
+/* 캐릭터 */
+.result-char {
+  width: 160px; height: 200px;
+  margin: 0 auto 24px;
+  position: relative;
+  filter: drop-shadow(0 0 30px rgba(0,229,255,0.25));
+  animation: charFloat 3.5s ease-in-out infinite;
+}
+
+@keyframes charFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  33%      { transform: translateY(-8px) rotate(0.5deg); }
+  66%      { transform: translateY(-4px) rotate(-0.5deg); }
+}
+
+.result-char svg { width: 100%; height: 100%; }
+
+/* 유형 코드 */
+.result-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(42px, 12vw, 58px);
+  font-weight: 700; letter-spacing: 0.1em;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--cyan) 0%, #FFFFFF 60%, var(--cyan2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 20px rgba(0,229,255,0.5));
+  margin-bottom: 12px;
+}
+
+/* 유형명 */
+.result-name {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(24px, 6vw, 32px);
+  color: var(--text); line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.result-tagline {
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+  max-width: 300px; margin: 0 auto 20px;
+}
+
+/* 유형 칩 */
+.result-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 4px; }
+
+.chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 100px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+}
+
+.chip.primary {
+  background: rgba(0,229,255,0.1);
+  border-color: rgba(0,229,255,0.3);
+  color: var(--cyan);
+}
+
+/* 본문 패널들 */
+.result-body { padding: 0 20px; }
+
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px; margin-top: 14px;
+}
+
+.panel-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.panel-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* 설명 텍스트 */
+.result-desc {
+  font-size: 14px; color: var(--text2); line-height: 1.8;
+}
+
+.result-desc strong { color: var(--cyan); font-weight: 500; }
+
+/* 트레이트 그리드 */
+.trait-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.trait-cell {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+}
+
+.trait-cell-label {
+  font-size: 10px; color: var(--text3); margin-bottom: 6px; display: block;
+}
+
+.trait-cell-val { font-size: 13px; color: var(--text); line-height: 1.4; font-weight: 500; }
+
+/* 축 바 */
+.axis-bars { display: flex; flex-direction: column; gap: 14px; }
+
+.abar { display: grid; grid-template-columns: 1fr; gap: 6px; }
+
+.abar-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.05em;
+  color: var(--text3);
+}
+
+.abar-labels b { font-weight: 700; font-style: normal; }
+.abar-labels em { font-style: normal; font-size: 9px; opacity: 0.55; margin: 0 2px; }
+.abar-labels .active { color: var(--cyan); }
+
+.abar-track {
+  height: 4px; background: var(--bg3); border-radius: 4px;
+  position: relative; overflow: hidden;
+}
+
+.abar-fill {
+  position: absolute; height: 100%;
+  background: linear-gradient(90deg, var(--cyan2), var(--cyan));
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0,229,255,0.5);
+  transition: width 0.7s cubic-bezier(0.2,0.8,0.2,1);
+}
+
+/* Next Step */
+.next-step {
+  border: 1px solid rgba(255,209,102,0.2);
+  background: rgba(255,209,102,0.04);
+  border-radius: 14px; padding: 20px; margin-top: 14px;
+  position: relative; overflow: hidden;
+}
+
+.next-step::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.next-step-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 10px;
+}
+
+.next-step-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 18px; color: var(--text); margin-bottom: 8px; line-height: 1.3;
+}
+
+.next-step-desc { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* 리더 박스 */
+.leader-box {
+  border: 1px solid rgba(199,125,255,0.2);
+  background: rgba(199,125,255,0.04);
+  border-radius: 14px; padding: 18px 20px; margin-top: 14px;
+}
+
+.leader-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--purple); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.leader-text { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* 통계 패널 */
+.stats-panel {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-top: 14px;
+}
+
+.stats-loading {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--text3); font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stats-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid var(--bg3);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stats-my-rank {
+  font-size: 13px; color: var(--text2); line-height: 1.6;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: rgba(0,229,255,0.05);
+  border: 1px solid rgba(0,229,255,0.1);
+  border-radius: 8px;
+}
+
+.stats-my-rank strong { color: var(--cyan); }
+
+.stats-bar-row {
+  display: grid; grid-template-columns: 70px 1fr 32px;
+  align-items: center; gap: 10px; margin-bottom: 8px;
+}
+
+.stats-type-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text3); white-space: nowrap;
+}
+
+.stats-bar-row.is-me .stats-type-label { color: var(--cyan); font-weight: 700; }
+
+.stats-bar-track {
+  height: 5px; background: var(--bg3); border-radius: 4px; overflow: hidden;
+}
+
+.stats-bar-fill {
+  height: 100%; background: var(--bg3); border-radius: 4px;
+  transition: width 0.7s cubic-bezier(0.2,0.8,0.2,1);
+}
+
+.stats-bar-row.is-me .stats-bar-fill {
+  background: linear-gradient(90deg, var(--cyan2), var(--cyan));
+  box-shadow: 0 0 6px rgba(0,229,255,0.5);
+}
+
+.stats-bar-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text3); text-align: right;
+}
+
+.stats-bar-row.is-me .stats-bar-count { color: var(--cyan); }
+
+/* 액션 버튼들 */
+.result-actions { display: flex; gap: 10px; padding: 14px 20px 0; }
+
+.btn-restart {
+  flex: 1; padding: 15px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px; color: var(--text2);
+  cursor: pointer; transition: all 0.18s;
+}
+
+.btn-restart:hover { border-color: var(--text3); color: var(--text); }
+
+.btn-share {
+  flex: 2; padding: 15px;
+  background: var(--cyan);
+  border: none; border-radius: 12px;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 14px; letter-spacing: 0.05em;
+  color: var(--bg); cursor: pointer;
+  transition: all 0.18s;
+  box-shadow: 0 0 20px rgba(0,229,255,0.25);
+}
+
+.btn-share:hover { background: #33EEFF; box-shadow: 0 0 30px rgba(0,229,255,0.4); }
+
+.result-footer {
+  text-align: center; padding: 20px 24px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--text3);
+}
+
+/* ── 스크롤바 ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 4px; }
+
+/* 이전/다음 네비게이션 */
+.q-back-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: 1px solid var(--border2);
+  border-radius: 8px; padding: 6px 12px;
+  color: var(--text3); font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px; cursor: pointer;
+  transition: all 0.18s;
+}
+
+.q-back-btn:hover:not(:disabled) {
+  border-color: rgba(0,229,255,0.3); color: var(--text2);
+}
+
+.q-back-btn:disabled {
+  opacity: 0; pointer-events: none;
+}
+
+.q-next-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 20px;
+  padding: 16px;
+  background: var(--cyan); color: var(--bg);
+  border: none; border-radius: 12px;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 16px; letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 24px rgba(0,229,255,0.25);
+}
+
+.q-next-btn:disabled {
+  background: var(--bg3);
+  color: var(--text3);
+  box-shadow: none;
+  cursor: default;
+}
+
+.q-next-btn:not(:disabled):hover {
+  background: #33EEFF;
+  box-shadow: 0 0 36px rgba(0,229,255,0.45);
+}
+
+.q-next-btn:not(:disabled):active { transform: scale(0.98); }
+
+/* ════ 캐릭터 갤러리 ════ */
+.gallery-panel { margin-top: 14px; }
+
+.gallery-desc {
+  font-size: 12px; color: var(--text3); margin-bottom: 16px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.gallery-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 6px 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: center;
+  position: relative;
+}
+
+.gallery-item:hover {
+  border-color: rgba(0,229,255,0.4);
+  background: rgba(0,229,255,0.05);
+  transform: translateY(-2px);
+}
+
+.gallery-item.is-me {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.08);
+  box-shadow: 0 0 12px rgba(0,229,255,0.2);
+}
+
+.gallery-item-char { width: 48px; height: 60px; margin: 0 auto 5px; }
+.gallery-item-char svg { width: 100%; height: 100%; }
+
+.gallery-item-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.05em;
+  color: var(--text3); display: block;
+  margin-bottom: 3px;
+}
+
+.gallery-item.is-me .gallery-item-code { color: var(--cyan); font-weight: 700; }
+
+.gallery-item-name {
+  display: block;
+  font-size: 9px;
+  color: var(--text2);
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+.gallery-item.is-me .gallery-item-name { color: var(--text); }
+
+.gallery-item-me-badge {
+  position: absolute; top: -4px; right: -4px;
+  width: 14px; height: 14px;
+  background: var(--cyan); border-radius: 50%;
+  font-size: 8px; display: flex; align-items: center; justify-content: center;
+  color: var(--bg); font-weight: 700;
+}
+
+/* ════ 모달 공통 ════ */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%; max-width: 360px;
+  position: relative;
+  animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 50%; width: 28px; height: 28px;
+  color: var(--text2); font-size: 12px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.modal-close:hover { background: var(--border2); color: var(--text); }
+
+.modal-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 20px; color: var(--text); margin-bottom: 4px;
+}
+
+.modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+
+/* ════ 공유 모달 ════ */
+.share-modal-box { padding: 24px 20px 20px; }
+
+.share-canvas-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  aspect-ratio: 3/4;
+  display: flex; align-items: center; justify-content: center;
+}
+
+#shareCanvas {
+  width: 100%; height: 100%;
+  display: block; border-radius: 11px;
+}
+
+.share-canvas-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg3);
+  border-radius: 11px;
+  transition: opacity 0.3s;
+}
+
+.share-canvas-loading.hidden { opacity: 0; pointer-events: none; }
+
+.share-spinner {
+  width: 28px; height: 28px;
+  border: 3px solid var(--bg);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* 버튼 영역 */
+.share-btns { display: flex; flex-direction: column; gap: 8px; }
+
+.share-btn-primary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 15px;
+  background: var(--cyan); color: var(--bg);
+  border: none; border-radius: 12px;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 15px; letter-spacing: 0.04em;
+  cursor: pointer; transition: all 0.18s;
+  box-shadow: 0 0 24px rgba(0,229,255,0.3);
+}
+
+.share-btn-primary:hover { background: #33EEFF; box-shadow: 0 0 36px rgba(0,229,255,0.45); }
+.share-btn-primary:active { transform: scale(0.98); }
+
+.share-btn-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+
+.share-btn-sub {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px 8px;
+  background: var(--bg3); color: var(--text2);
+  border: 1px solid var(--border2); border-radius: 10px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px; cursor: pointer; transition: all 0.18s;
+}
+
+.share-btn-sub:hover { border-color: rgba(0,229,255,0.3); color: var(--text); }
+.share-btn-sub:active { transform: scale(0.97); }
+
+/* ════ 캐릭터 상세 모달 ════ */
+.char-modal-box { text-align: center; }
+
+.char-modal-char {
+  width: 120px; height: 150px; margin: 0 auto 16px;
+  filter: drop-shadow(0 0 20px rgba(0,229,255,0.25));
+}
+
+.char-modal-char svg { width: 100%; height: 100%; }
+
+.char-modal-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px; font-weight: 700; letter-spacing: 0.1em;
+  background: linear-gradient(135deg, var(--cyan), #fff 60%, var(--cyan2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(0,229,255,0.3));
+  margin-bottom: 8px;
+}
+
+.char-modal-name {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 20px; color: var(--text); margin-bottom: 6px;
+}
+
+.char-modal-tagline {
+  font-size: 12px; color: var(--cyan);
+  margin-bottom: 14px; line-height: 1.5;
+}
+
+.char-modal-desc {
+  font-size: 13px; color: var(--text2); line-height: 1.75;
+  text-align: left;
+  background: var(--bg3); border-radius: 10px;
+  padding: 14px; margin-top: 4px;
+}
+
+@media (max-width:380px) {
+  .app { padding: 0; }
+  .intro-wrap, .q-wrap { padding-left: 16px; padding-right: 16px; }
+}
 </style>
 </head>
 <body>
 
+<div class="bg-glow"></div>
+
 <div class="app">
 
-  <!-- ============ INTRO ============ -->
-  <section class="screen active" id="intro">
-    <div class="intro">
-      <div class="brand">
-        <span class="dot"></span>
-        <span>C-LAB · AI SEMINAR 2026</span>
-      </div>
+<!-- ════ INTRO ════ -->
+<section class="screen active" id="intro">
+  <div class="intro-wrap">
+    <div class="intro-badge"><span class="ping"></span>C-Lab · AI Seminar 2026</div>
 
-      <h1>당신은 AI를<br>어떻게 <em>다루는</em> 사람입니까?</h1>
+    <div class="intro-eyebrow">AI 직업 유형 진단</div>
+    <h1 class="intro-title">
+      <span class="line1">당신은 AI를</span>
+      <span class="line2">어떻게 쓰는가</span>
+    </h1>
 
-      <p class="lede">
-        2022년 ChatGPT 등장 이후, 세상은 "질문하는 사람"의 시대를 지나
-        "만드는 사람"의 시대로 넘어가고 있습니다. 이 짧은 진단은 당신이
-        이 흐름 위 어느 지점에 서 있는지 비춰봅니다.
-      </p>
+    <p class="intro-sub">
+      2022년 ChatGPT 이후 세상은 빠르게 바뀌었습니다.<br>
+      당신이 이 흐름 위 어느 지점에 있는지, 12개의 질문으로 알아봅니다.
+    </p>
 
-      <div class="safe-note">
-        <strong>부담 없이 시작하세요.</strong><br>
-        AI를 많이 써보지 않았어도 괜찮습니다. 잘 모르겠거나 해당사항이 없는 문항에는
-        <strong>"잘 모르겠음"</strong>을 고르면 됩니다. 그 답변도 당신의 성향을 말해줍니다.
-      </div>
-
-      <div class="meta-row">
-        <div class="meta-item">
-          <div class="meta-label">Questions</div>
-          <div class="meta-value">12</div>
-        </div>
-        <div class="meta-item">
-          <div class="meta-label">Duration</div>
-          <div class="meta-value">3 min</div>
-        </div>
-        <div class="meta-item">
-          <div class="meta-label">Types</div>
-          <div class="meta-value">16</div>
-        </div>
-      </div>
-
-      <button class="start-btn" onclick="startTest()">진단 시작하기</button>
+    <div class="intro-stats">
+      <div class="istat"><span class="istat-num">12</span><span class="istat-label">Questions</span></div>
+      <div class="istat"><span class="istat-num">3<span style="font-size:14px">min</span></span><span class="istat-label">Duration</span></div>
+      <div class="istat"><span class="istat-num">16</span><span class="istat-label">Types</span></div>
     </div>
-  </section>
 
-  <!-- ============ QUESTIONS ============ -->
-  <section class="screen" id="questions">
-    <div class="question-screen">
-      <div class="progress-wrap">
-        <div class="progress-top">
-          <span class="progress-label">— Progress</span>
-          <span class="progress-count"><strong id="qCurrent">1</strong> / 12</span>
+    <div class="axis-preview">
+      <div class="axis-preview-title">— 4가지 진단 축</div>
+
+      <div class="axis-row">
+        <div class="axis-row-header">
+          <span class="axis-name">관심도</span>
+          <span class="axis-code">O / E</span>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
+        <div class="axis-split">
+          <div class="axis-split-left">
+            <span class="axis-split-en">Observer</span>
+            <span class="axis-split-ko">관망형</span>
+          </div>
+          <div class="axis-split-divider"></div>
+          <div class="axis-split-right">
+            <span class="axis-split-en">Executor</span>
+            <span class="axis-split-ko">탐색형</span>
+          </div>
         </div>
       </div>
 
-      <div class="question-card" id="questionCard">
-        <div class="q-tag" id="qTag">— Axis 01 · O / E</div>
-        <div class="q-text" id="qText"></div>
-        <div class="options" id="options"></div>
+      <div class="axis-row">
+        <div class="axis-row-header">
+          <span class="axis-name">행동유형</span>
+          <span class="axis-code">C / M</span>
+        </div>
+        <div class="axis-split">
+          <div class="axis-split-left">
+            <span class="axis-split-en">Consumer</span>
+            <span class="axis-split-ko">소비형</span>
+          </div>
+          <div class="axis-split-divider"></div>
+          <div class="axis-split-right">
+            <span class="axis-split-en">Maker</span>
+            <span class="axis-split-ko">제작형</span>
+          </div>
+        </div>
       </div>
+
+      <div class="axis-row">
+        <div class="axis-row-header">
+          <span class="axis-name">작업방식</span>
+          <span class="axis-code">I / S</span>
+        </div>
+        <div class="axis-split">
+          <div class="axis-split-left">
+            <span class="axis-split-en">Intuitive</span>
+            <span class="axis-split-ko">직관형</span>
+          </div>
+          <div class="axis-split-divider"></div>
+          <div class="axis-split-right">
+            <span class="axis-split-en">Systematic</span>
+            <span class="axis-split-ko">체계형</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="axis-row">
+        <div class="axis-row-header">
+          <span class="axis-name">확산방식</span>
+          <span class="axis-code">P / T</span>
+        </div>
+        <div class="axis-split">
+          <div class="axis-split-left">
+            <span class="axis-split-en">Personal</span>
+            <span class="axis-split-ko">개인형</span>
+          </div>
+          <div class="axis-split-divider"></div>
+          <div class="axis-split-right">
+            <span class="axis-split-en">Transmitter</span>
+            <span class="axis-split-ko">전파형</span>
+          </div>
+        </div>
+      </div>
+
     </div>
-  </section>
 
-  <!-- ============ RESULT ============ -->
-  <section class="screen" id="result">
-    <div class="result-screen">
-      <div class="result-header">
-        <div class="result-tag">— Your AI Personality Type</div>
-        <div class="character-visual" id="characterVisual"></div>
-        <div class="result-code" id="resultCode">EMST</div>
+    <button class="cta-btn" onclick="startTest()">진단 시작하기</button>
+  </div>
+</section>
+
+<!-- ════ QUESTIONS ════ -->
+<section class="screen" id="questions">
+  <div class="q-wrap">
+    <div class="q-progress">
+      <div class="q-progress-top">
+        <button class="q-back-btn" id="qBackBtn" onclick="goBack()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          이전
+        </button>
+        <span class="q-progress-frac"><strong id="qNum">1</strong> / 12</span>
+      </div>
+      <div class="q-bar-track"><div class="q-bar-fill" id="qBar"></div></div>
+    </div>
+
+    <div id="qCard" class="q-card">
+      <div class="q-axis-tag" id="qTag"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-options" id="qOptions"></div>
+    </div>
+
+    <button class="q-next-btn" id="qNextBtn" onclick="goNext()" disabled>
+      다음으로
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- ════ RESULT ════ -->
+<section class="screen" id="result">
+  <div class="result-wrap">
+
+    <!-- 히어로 카드 -->
+    <div class="result-hero">
+      <div class="result-hero-inner">
+        <div class="result-series">— Your AI Type · Samsung C-Lab —</div>
+        <div class="result-char" id="resultChar"></div>
+        <div class="result-code" id="resultCode"></div>
         <div class="result-name" id="resultName"></div>
         <div class="result-tagline" id="resultTagline"></div>
-        <div class="stat-chips" id="statChips"></div>
+        <div class="result-chips" id="resultChips"></div>
+      </div>
+    </div>
+
+    <!-- 본문 -->
+    <div class="result-body">
+
+      <div class="panel">
+        <div class="panel-label">성향 분석</div>
+        <div class="result-desc" id="resultDesc"></div>
       </div>
 
-      <div class="divider"></div>
+      <div class="panel">
+        <div class="panel-label">한눈에 보기</div>
+        <div class="trait-grid" id="traitGrid"></div>
+      </div>
 
-      <div class="section-label">— 당신의 성향</div>
-      <div class="result-desc" id="resultDesc"></div>
+      <div class="panel">
+        <div class="panel-label">4축 분포</div>
+        <div class="axis-bars" id="axisBars"></div>
+      </div>
 
-      <div class="section-label">— 한눈에 보기</div>
-      <div class="trait-grid" id="traitGrid"></div>
-
-      <div class="section-label">— 4축 분포</div>
-      <div class="axis-bars" id="axisBars"></div>
-
-      <div class="divider"></div>
-
-      <div class="section-label">— 다음 한 걸음</div>
       <div class="next-step">
-        <div class="next-step-label" id="nextStepLabel">Recommended</div>
-        <div class="next-step-title" id="nextStepTitle"></div>
-        <div class="next-step-desc" id="nextStepDesc"></div>
+        <div class="next-step-eyebrow" id="nextLabel"></div>
+        <div class="next-step-title" id="nextTitle"></div>
+        <div class="next-step-desc" id="nextDesc"></div>
       </div>
 
-      <div class="leader-box" id="leaderBox">
-        <div class="leader-header">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" fill="currentColor"/>
-          </svg>
-          <span>팀을 이끄는 분이라면</span>
+      <div class="leader-box">
+        <div class="leader-eyebrow">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" fill="currentColor"/></svg>
+          팀을 이끄는 분이라면
         </div>
         <div class="leader-text" id="leaderText"></div>
       </div>
 
-      <div class="divider"></div>
+      <!-- 다른 캐릭터 탐색 -->
+      <div class="panel gallery-panel">
+        <div class="panel-label">다른 유형 탐색하기</div>
+        <p class="gallery-desc">16가지 AI 직업 유형을 둘러보세요</p>
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
 
-      <div class="section-label">— 지금까지 참여자 분포</div>
-      <div class="stats-panel" id="statsPanel">
+      <div class="stats-panel">
+        <div class="panel-label">참여자 분포</div>
         <div class="stats-loading" id="statsLoading">
           <div class="stats-spinner"></div>
-          <span>참여자 데이터 불러오는 중…</span>
+          <span>데이터 불러오는 중…</span>
         </div>
-        <div class="stats-content" id="statsContent" style="display:none">
+        <div id="statsContent" style="display:none">
           <div class="stats-my-rank" id="statsMyRank"></div>
-          <div class="stats-bars" id="statsBars"></div>
+          <div id="statsBars"></div>
         </div>
       </div>
 
-      <div class="actions">
-        <button class="btn-secondary" onclick="restart()">다시 하기</button>
-        <button class="btn-primary" onclick="shareResult()">결과 공유</button>
-      </div>
+    </div><!-- /result-body -->
 
-      <div class="footer-note">— Built for C-Lab · Samsung Electronics</div>
+    <div class="result-actions">
+      <button class="btn-restart" onclick="restart()">↩ 다시 하기</button>
+      <button class="btn-share" onclick="openShareModal()">✦ 공유 카드 만들기</button>
     </div>
-  </section>
 
+    <div class="result-footer">Built for C-Lab · Samsung Electronics</div>
+
+  </div>
+</section>
+
+
+<!-- ════ 공유 모달 ════ -->
+<div class="modal-overlay" id="shareModal" onclick="closeShareModal()">
+  <div class="modal-box share-modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeShareModal()">✕</button>
+    <div class="modal-title">내 유형 공유하기</div>
+    <div class="modal-sub" id="shareModalSub">카드 이미지를 만들고 있어요…</div>
+
+    <!-- Canvas 미리보기 -->
+    <div class="share-canvas-wrap">
+      <canvas id="shareCanvas" width="600" height="800"></canvas>
+      <div class="share-canvas-loading" id="shareCanvasLoading">
+        <div class="share-spinner"></div>
+      </div>
+    </div>
+
+    <!-- 버튼들 -->
+    <div class="share-btns" id="shareBtns" style="display:none">
+      <button class="share-btn-primary" id="sharePrimaryBtn" onclick="doShare()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="sharePrimaryLabel">이미지 공유하기</span>
+      </button>
+      <div class="share-btn-row">
+        <button class="share-btn-sub" onclick="doDownload()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          이미지 저장
+        </button>
+        <button class="share-btn-sub" onclick="doCopyLink()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="copyLinkLabel">링크 복사</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
+<!-- ════ 캐릭터 상세 모달 ════ -->
+<div class="modal-overlay" id="charModal" onclick="closeCharModal()">
+  <div class="modal-box char-modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeCharModal()">✕</button>
+    <div class="char-modal-char" id="charModalChar"></div>
+    <div class="char-modal-code" id="charModalCode"></div>
+    <div class="char-modal-name" id="charModalName"></div>
+    <div class="char-modal-tagline" id="charModalTagline"></div>
+    <div class="char-modal-desc" id="charModalDesc"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
 <script>
-  // ============ QUESTIONS v3 ============
-  // Axis 1 O/E: "AI에 얼마나 관심·에너지를 쏟는가" (태도·관심도)
-  //   O = 거리감·관망  E = 적극 탐색·에너지 투입
-  // Axis 2 C/M: "AI로 무엇을 하는가" (행동 유형, 관심도와 독립)
-  //   C = 결과물을 받아 쓰는 소비형  M = 직접 조립·제작하는 제작형
-  //   → EC 실재: "AI에 적극적(E)이지만 만들지 않고 잘 쓰는(C) 파워유저"
-  // N 응답: 해당 축의 수동/소극 방향으로 0.5점 가중
+  // ════════════════════════════════════════════════
+  // 전체 로직 (questions · types · characters · stats)
+  // v4 문항 + v5 캐릭터/통계 기반
+  // ════════════════════════════════════════════════
+
+  // ── QUESTIONS ──
   const questions = [
-    // ── Axis 1: O / E  (AI 관심도·태도) ──────────────────────────
-    {
-      axis: 'OE', tag: '— Axis 01 · 관심도',
-      text: 'AI 관련 뉴스나 신규 서비스 소식을 접하면?',
-      options: [
-        { text: '흥미롭긴 한데, 내 일과 직접 연결되진 않는 것 같다', score: 'O' },
-        { text: '바로 찾아보고, 내 업무에 어떻게 쓸지 생각해본다', score: 'E' },
-        { text: '솔직히 별로 눈길이 가지 않는다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'OE', tag: '— Axis 01 · 관심도',
-      text: '동료가 "AI로 이런 것도 되더라"고 보여줬을 때?',
-      options: [
-        { text: '"오, 신기하다" 하고 넘어간다', score: 'O' },
-        { text: '"나도 한번 써봐야지"라며 그 자리에서 계정을 만든다', score: 'E' },
-        { text: '잘 모르겠어서 리액션이 어렵다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'OE', tag: '— Axis 01 · 관심도',
-      text: '요즘 AI 툴을 배우거나 실험해보는 데 시간을 쓰는 편인가요?',
-      options: [
-        { text: '관심은 있지만, 따로 시간을 내서 하진 않는다', score: 'O' },
-        { text: '의식적으로 시간을 들여 써보거나 공부하는 편이다', score: 'E' },
-        { text: '아직 그럴 동기나 여유가 없다', score: 'N' }
-      ]
-    },
-    // ── Axis 2: C / M  (AI로 무엇을 하는가) ─────────────────────
-    {
-      axis: 'CM', tag: '— Axis 02 · 행동유형',
-      text: '업무에서 AI를 쓸 때(또는 쓴다면), 주로 어떤 방식인가?',
-      options: [
-        { text: '필요한 답을 받아서 바로 업무에 활용한다', score: 'C' },
-        { text: '업무 흐름 자체를 AI로 자동화하거나 도구로 만든다', score: 'M' },
-        { text: '아직 업무에 써본 적이 거의 없다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'CM', tag: '— Axis 02 · 행동유형',
-      text: 'AI가 만들어준 결과물을 받았을 때, 더 끌리는 형태는?',
-      options: [
-        { text: '내 업무에 바로 붙여쓸 수 있는 완성된 형태', score: 'C' },
-        { text: '내가 조립하거나 고칠 수 있는 재료 형태', score: 'M' },
-        { text: 'AI 결과물을 받아본 경험이 거의 없다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'CM', tag: '— Axis 02 · 행동유형',
-      text: '"코딩을 배우지 않아도 말만으로 간단한 앱을 만들 수 있다"는 말을 들으면?',
-      options: [
-        { text: '신기하긴 한데, 굳이 내가 만들 필요는 없을 것 같다', score: 'C' },
-        { text: '바로 어떤 걸 만들지 머릿속에 그려진다', score: 'M' },
-        { text: '그게 실제로 가능한지 잘 모르겠다', score: 'N' }
-      ]
-    },
-    // ── Axis 3: I / S  (작업 방식) ───────────────────────────────
-    {
-      axis: 'IS', tag: '— Axis 03 · 작업방식',
-      text: 'AI에게 뭔가를 부탁할 때(또는 부탁한다면), 더 가까운 방식은?',
-      options: [
-        { text: '일단 생각나는 대로 말 걸고, 오가며 다듬는다', score: 'I' },
-        { text: '역할·맥락·형식을 미리 정리해서 한 번에 던진다', score: 'S' },
-        { text: 'AI한테 뭔가를 부탁해본 경험이 별로 없다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'IS', tag: '— Axis 03 · 작업방식',
-      text: '유용한 정보나 방법을 발견했을 때 당신은?',
-      options: [
-        { text: '일단 써보고, 필요할 때 다시 찾아보는 편이다', score: 'I' },
-        { text: '메모·폴더에 구조적으로 정리해둔다', score: 'S' },
-        { text: '별로 정리하는 편이 아니고, 찾아보지도 않는다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'IS', tag: '— Axis 03 · 작업방식',
-      text: '새로운 도구를 배울 때 당신의 방식은?',
-      options: [
-        { text: '일단 눌러보면서 감으로 익힌다', score: 'I' },
-        { text: '매뉴얼이나 가이드를 먼저 읽는다', score: 'S' },
-        { text: '누가 옆에서 알려주지 않으면 잘 안 배우게 된다', score: 'N' }
-      ]
-    },
-    // ── Axis 4: P / T  (확산 방식) ───────────────────────────────
-    {
-      axis: 'PT', tag: '— Axis 04 · 확산방식',
-      text: '업무에서 효율적인 방법을 찾았을 때, 당신의 반응은?',
-      options: [
-        { text: '나한테 맞게 좀 더 다듬은 다음에, 괜찮으면 공유한다', score: 'P' },
-        { text: '바로 팀원에게 알리거나 채널에 공유한다', score: 'T' },
-        { text: '딱히 발견한 적이 없거나, 공유까지 생각은 안 해봤다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'PT', tag: '— Axis 04 · 확산방식',
-      text: '회의에서 새로운 아이디어나 방법이 거론될 때?',
-      options: [
-        { text: '필요할 때만 의견을 낸다. 먼저 나서진 않는다', score: 'P' },
-        { text: '최근에 써본 것이나 배운 것을 적극적으로 꺼낸다', score: 'T' },
-        { text: '보통 듣는 쪽이다', score: 'N' }
-      ]
-    },
-    {
-      axis: 'PT', tag: '— Axis 04 · 확산방식',
-      text: '내가 발견한 AI 활용법이 조직 전체로 퍼진다면?',
-      options: [
-        { text: '좋은 일이지만, 내가 직접 나서서 퍼뜨릴 생각은 없다', score: 'P' },
-        { text: '그렇게 만들고 싶어서 세미나나 공유 채널을 적극 활용한다', score: 'T' },
-        { text: '그런 상황 자체를 아직 상상해본 적이 없다', score: 'N' }
-      ]
-    }
+    { axis:'OE', tag:'— Axis 01 · 관심도',
+      text:'AI 관련 뉴스나 신규 서비스 소식을 접하면?',
+      options:[
+        {text:'흥미롭긴 한데, 내 일과 직접 연결되진 않는 것 같다', score:'O'},
+        {text:'바로 찾아보고, 내 업무에 어떻게 쓸지 생각해본다', score:'E'},
+        {text:'지금은 다른 것들이 더 우선순위다', score:'N'}
+      ]},
+    { axis:'OE', tag:'— Axis 01 · 관심도',
+      text:'동료가 "AI로 이런 것도 되더라"고 보여줬을 때?',
+      options:[
+        {text:'"오, 신기하다" 하고 넘어간다', score:'O'},
+        {text:'"나도 한번 써봐야지"라며 그 자리에서 계정을 만든다', score:'E'},
+        {text:'잘 모르겠어서 리액션이 어렵다', score:'N'}
+      ]},
+    { axis:'OE', tag:'— Axis 01 · 관심도',
+      text:'요즘 AI 툴을 배우거나 실험해보는 데 시간을 쓰는 편인가요?',
+      options:[
+        {text:'관심은 있지만, 따로 시간을 내서 하진 않는다', score:'O'},
+        {text:'의식적으로 시간을 들여 써보거나 공부하는 편이다', score:'E'},
+        {text:'아직 그럴 동기나 여유가 없다', score:'N'}
+      ]},
+    { axis:'CM', tag:'— Axis 02 · 행동유형',
+      text:'업무에서 AI를 활용한다면, 어떤 방식에 더 가까운가요?',
+      options:[
+        {text:'필요한 답을 받아서 바로 업무에 활용한다', score:'C'},
+        {text:'업무 흐름 자체를 AI로 자동화하거나 도구로 만든다', score:'M'},
+        {text:'아직 업무에 써본 적이 거의 없다', score:'N'}
+      ]},
+    { axis:'CM', tag:'— Axis 02 · 행동유형',
+      text:'AI가 만들어준 결과물을 받았을 때, 더 끌리는 형태는?',
+      options:[
+        {text:'내 업무에 바로 붙여쓸 수 있는 완성된 형태', score:'C'},
+        {text:'내가 조립하거나 고칠 수 있는 재료 형태', score:'M'},
+        {text:'AI 결과물을 받아본 경험이 거의 없다', score:'N'}
+      ]},
+    { axis:'CM', tag:'— Axis 02 · 행동유형',
+      text:'"코딩을 배우지 않아도 말만으로 간단한 앱을 만들 수 있다"는 말을 들으면?',
+      options:[
+        {text:'신기하긴 한데, 잘 만들어진 도구를 잘 쓰는 게 더 낫지 않을까 싶다', score:'C'},
+        {text:'바로 어떤 걸 만들지 머릿속에 그려진다', score:'M'},
+        {text:'가능하다면 흥미롭지만, 아직 내 얘기 같지는 않다', score:'N'}
+      ]},
+    { axis:'IS', tag:'— Axis 03 · 작업방식',
+      text:'AI에게 뭔가를 부탁할 때(또는 부탁한다면), 더 가까운 방식은?',
+      options:[
+        {text:'일단 생각나는 대로 말 걸고, 오가며 다듬는다', score:'I'},
+        {text:'역할·맥락·형식을 미리 정리해서 한 번에 던진다', score:'S'},
+        {text:'AI한테 뭔가를 부탁해본 경험이 별로 없다', score:'N'}
+      ]},
+    { axis:'IS', tag:'— Axis 03 · 작업방식',
+      text:'유용한 정보나 방법을 발견했을 때 당신은?',
+      options:[
+        {text:'일단 써보고, 필요할 때 다시 찾아보는 편이다', score:'I'},
+        {text:'메모·폴더에 구조적으로 정리해둔다', score:'S'},
+        {text:'상황에 따라 다르고, 딱히 정해진 방식이 없다', score:'N'}
+      ]},
+    { axis:'IS', tag:'— Axis 03 · 작업방식',
+      text:'새로운 도구를 배울 때 당신의 방식은?',
+      options:[
+        {text:'일단 눌러보면서 감으로 익힌다', score:'I'},
+        {text:'매뉴얼이나 가이드를 먼저 읽는다', score:'S'},
+        {text:'혼자 익히기보다 같이 배우는 환경이 있어야 잘 된다', score:'N'}
+      ]},
+    { axis:'PT', tag:'— Axis 04 · 확산방식',
+      text:'업무에서 효율적인 방법을 찾았을 때, 당신의 반응은?',
+      options:[
+        {text:'나한테 맞게 좀 더 다듬은 다음에, 괜찮으면 공유한다', score:'P'},
+        {text:'바로 팀원에게 알리거나 채널에 공유한다', score:'T'},
+        {text:'아직 그런 상황이 많지 않았다', score:'N'}
+      ]},
+    { axis:'PT', tag:'— Axis 04 · 확산방식',
+      text:'회의에서 새로운 아이디어나 방법이 거론될 때?',
+      options:[
+        {text:'필요할 때만 의견을 낸다. 먼저 나서진 않는다', score:'P'},
+        {text:'최근에 써본 것이나 배운 것을 적극적으로 꺼낸다', score:'T'},
+        {text:'보통 듣는 쪽이다', score:'N'}
+      ]},
+    { axis:'PT', tag:'— Axis 04 · 확산방식',
+      text:'내가 발견한 AI 활용법이 조직 전체로 퍼진다면?',
+      options:[
+        {text:'좋은 일이지만, 내가 직접 나서서 퍼뜨릴 생각은 없다', score:'P'},
+        {text:'그렇게 만들고 싶어서 세미나나 공유 채널을 적극 활용한다', score:'T'},
+        {text:'아직 그 단계까지는 생각해보지 않았다', score:'N'}
+      ]}
   ];
 
-  // ============ CHARACTER VISUALS v5 — 표정 있는 캐릭터 ============
+  // ── CHARACTERS ──
   const charData = {
-    // bg=배경, body=몸 색, face=얼굴 색, acc=강조, mood=표정 키, item=들고 있는 것
-    'EMST': { bg:'#1428A0', body:'#2E4BC7', face:'#FFD6A5', acc:'#00C2FF', mood:'excited', item:'laptop' },
-    'EMSP': { bg:'#0A1854', body:'#1428A0', face:'#FFD6A5', acc:'#8B93A8', mood:'focused', item:'wrench' },
-    'EMIT': { bg:'#00C2FF', body:'#1428A0', face:'#FFD6A5', acc:'#FFFFFF', mood:'excited', item:'spark' },
-    'EMIP': { bg:'#2E4BC7', body:'#1428A0', face:'#FFD6A5', acc:'#00C2FF', mood:'calm',    item:'wrench' },
-    'ECST': { bg:'#1428A0', body:'#00C2FF', face:'#FFD6A5', acc:'#FFFFFF', mood:'excited', item:'megaphone' },
-    'ECSP': { bg:'#3A4256', body:'#2E4BC7', face:'#FFD6A5', acc:'#00C2FF', mood:'focused', item:'magnifier' },
-    'ECIT': { bg:'#0A8BC7', body:'#00C2FF', face:'#FFD6A5', acc:'#FFFFFF', mood:'happy',   item:'megaphone' },
-    'ECIP': { bg:'#8B93A8', body:'#6B7490', face:'#FFD6A5', acc:'#FFFFFF', mood:'calm',    item:'coffee' },
-    'OMST': { bg:'#0A1854', body:'#1428A0', face:'#FFD6A5', acc:'#00C2FF', mood:'focused', item:'blueprint' },
-    'OMSP': { bg:'#3A4256', body:'#2E4BC7', face:'#FFD6A5', acc:'#8B93A8', mood:'calm',    item:'magnifier' },
-    'OMIT': { bg:'#2E4BC7', body:'#1428A0', face:'#FFD6A5', acc:'#00C2FF', mood:'happy',   item:'spark' },
-    'OMIP': { bg:'#0B1220', body:'#1428A0', face:'#FFD6A5', acc:'#4A5578', mood:'calm',    item:'moon' },
-    'OCST': { bg:'#1428A0', body:'#2E4BC7', face:'#FFD6A5', acc:'#00C2FF', mood:'happy',   item:'book' },
-    'OCSP': { bg:'#3A4256', body:'#4A5578', face:'#FFD6A5', acc:'#8B93A8', mood:'focused', item:'book' },
-    'OCIT': { bg:'#0A8BC7', body:'#2E4BC7', face:'#FFD6A5', acc:'#FFFFFF', mood:'happy',   item:'coffee' },
-    'OCIP': { bg:'#C8D8E8', body:'#8BA8C8', face:'#FFD6A5', acc:'#1428A0', mood:'shy',     item:'seedling' }
+    'EMST':{bg:'#0A1628',body:'#1E3A6E',face:'#FFD6A5',acc:'#00E5FF',mood:'excited',item:'laptop'},
+    'EMSP':{bg:'#0A1220',body:'#1428A0',face:'#FFD6A5',acc:'#8B93A8',mood:'focused',item:'wrench'},
+    'EMIT':{bg:'#001824',body:'#00607A',face:'#FFD6A5',acc:'#00E5FF',mood:'excited',item:'spark'},
+    'EMIP':{bg:'#0D1830',body:'#1428A0',face:'#FFD6A5',acc:'#00E5FF',mood:'calm',item:'wrench'},
+    'ECST':{bg:'#0A1628',body:'#00607A',face:'#FFD6A5',acc:'#00E5FF',mood:'excited',item:'megaphone'},
+    'ECSP':{bg:'#141A28',body:'#2E4BC7',face:'#FFD6A5',acc:'#00E5FF',mood:'focused',item:'magnifier'},
+    'ECIT':{bg:'#001824',body:'#0088AA',face:'#FFD6A5',acc:'#FFFFFF',mood:'happy',item:'megaphone'},
+    'ECIP':{bg:'#181C24',body:'#4A5568',face:'#FFD6A5',acc:'#8A97AE',mood:'calm',item:'coffee'},
+    'OMST':{bg:'#080E1A',body:'#1428A0',face:'#FFD6A5',acc:'#00E5FF',mood:'focused',item:'blueprint'},
+    'OMSP':{bg:'#101620',body:'#2E4BC7',face:'#FFD6A5',acc:'#8B93A8',mood:'calm',item:'magnifier'},
+    'OMIT':{bg:'#0C1428',body:'#1428A0',face:'#FFD6A5',acc:'#C77DFF',mood:'happy',item:'spark'},
+    'OMIP':{bg:'#060A10',body:'#0E1A30',face:'#FFD6A5',acc:'#4A5578',mood:'calm',item:'moon'},
+    'OCST':{bg:'#0A1628',body:'#2E4BC7',face:'#FFD6A5',acc:'#00E5FF',mood:'happy',item:'book'},
+    'OCSP':{bg:'#101620',body:'#3A4256',face:'#FFD6A5',acc:'#8B93A8',mood:'focused',item:'book'},
+    'OCIT':{bg:'#001824',body:'#2E4BC7',face:'#FFD6A5',acc:'#00E5FF',mood:'happy',item:'coffee'},
+    'OCIP':{bg:'#0E1420',body:'#2A3A50',face:'#FFD6A5',acc:'#4A6A8A',mood:'shy',item:'seedling'}
   };
 
-  function renderCharacter(type) {
+  function buildChar(type) {
     const d = charData[type] || charData['OCIP'];
-
-    // 표정 정의 (눈썹 + 눈 + 입)
+    const ink = '#5C3A1E';
     const moods = {
-      excited: `
-        <path d="M52 54 Q56 50 60 54" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M80 54 Q84 50 88 54" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <circle cx="56" cy="60" r="4.5" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <circle cx="84" cy="60" r="4.5" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <circle cx="58" cy="58.5" r="1.5" fill="white" opacity="0.8"/>
-        <circle cx="86" cy="58.5" r="1.5" fill="white" opacity="0.8"/>
-        <path d="M60 74 Q70 82 80 74" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M60 74 Q70 84 80 74" fill="${d.face === '#FFD6A5' ? '#C87060' : 'rgba(255,255,255,0.3)'}"/>`,
-      focused: `
-        <path d="M50 57 L62 55" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M78 55 L90 57" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="56" cy="62" r="4" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <circle cx="84" cy="62" r="4" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <circle cx="57.5" cy="60.5" r="1.5" fill="white" opacity="0.8"/>
-        <circle cx="85.5" cy="60.5" r="1.5" fill="white" opacity="0.8"/>
-        <path d="M62 76 Q70 78 78 76" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
-      happy: `
-        <path d="M51 58 Q56 53 61 58" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M79 58 Q84 53 89 58" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M51 61 Q56 67 61 61" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <path d="M79 61 Q84 67 89 61" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <path d="M60 74 Q70 82 80 74" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M60 74 Q70 83 80 74" fill="${d.face === '#FFD6A5' ? '#C87060' : 'rgba(255,255,255,0.3)'}"/>
-        <circle cx="50" cy="68" r="5" fill="${d.acc}" opacity="0.4"/>
-        <circle cx="90" cy="68" r="5" fill="${d.acc}" opacity="0.4"/>`,
-      calm: `
-        <path d="M51 58 Q56 54 61 58" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M79 58 Q84 54 89 58" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <ellipse cx="56" cy="63" rx="4" ry="3.5" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <ellipse cx="84" cy="63" rx="4" ry="3.5" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#fff'}"/>
-        <circle cx="57.5" cy="62" r="1.5" fill="white" opacity="0.8"/>
-        <circle cx="85.5" cy="62" r="1.5" fill="white" opacity="0.8"/>
-        <path d="M63 76 Q70 79 77 76" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
-      shy: `
-        <path d="M52 60 Q57 56 62 60" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#1428A0'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M78 60 Q83 56 88 60" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#1428A0'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <circle cx="57" cy="64" r="3.5" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#1428A0'}"/>
-        <circle cx="83" cy="64" r="3.5" fill="${d.face === '#FFD6A5' ? '#5C3A1E' : '#1428A0'}"/>
-        <circle cx="58.5" cy="63" r="1.2" fill="white" opacity="0.8"/>
-        <circle cx="84.5" cy="63" r="1.2" fill="white" opacity="0.8"/>
-        <path d="M63 76 Q70 73 77 76" stroke="${d.face === '#FFD6A5' ? '#8B6340' : '#1428A0'}" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <circle cx="50" cy="68" r="5" fill="#FF9999" opacity="0.5"/>
-        <circle cx="90" cy="68" r="5" fill="#FF9999" opacity="0.5"/>`
+      excited:`
+        <path d="M50 52 Q56 46 62 52" stroke="${ink}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M78 52 Q84 46 90 52" stroke="${ink}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="56" cy="59" rx="5" ry="5.5" fill="${ink}"/>
+        <ellipse cx="84" cy="59" rx="5" ry="5.5" fill="${ink}"/>
+        <circle cx="58" cy="57" r="1.8" fill="white" opacity="0.9"/>
+        <circle cx="86" cy="57" r="1.8" fill="white" opacity="0.9"/>
+        <path d="M58 74 Q70 84 82 74" stroke="${ink}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M58 74 Q70 86 82 74 Z" fill="#C87060"/>`,
+      focused:`
+        <path d="M48 55 L63 53" stroke="${ink}" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M77 53 L92 55" stroke="${ink}" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="56" cy="61" rx="4.5" ry="4" fill="${ink}"/>
+        <ellipse cx="84" cy="61" rx="4.5" ry="4" fill="${ink}"/>
+        <circle cx="57.5" cy="59.5" r="1.5" fill="white" opacity="0.9"/>
+        <circle cx="85.5" cy="59.5" r="1.5" fill="white" opacity="0.9"/>
+        <path d="M62 75 Q70 78 78 75" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+      happy:`
+        <path d="M50 56 Q56 50 62 56" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M78 56 Q84 50 90 56" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M50 59 Q56 67 62 59" fill="${ink}"/>
+        <path d="M78 59 Q84 67 90 59" fill="${ink}"/>
+        <path d="M58 73 Q70 83 82 73" stroke="${ink}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M58 73 Q70 84 82 73 Z" fill="#C87060"/>
+        <circle cx="48" cy="67" r="5.5" fill="#FF9999" opacity="0.4"/>
+        <circle cx="92" cy="67" r="5.5" fill="#FF9999" opacity="0.4"/>`,
+      calm:`
+        <path d="M50 56 Q56 52 62 56" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M78 56 Q84 52 90 56" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="56" cy="62" rx="4.5" ry="4" fill="${ink}"/>
+        <ellipse cx="84" cy="62" rx="4.5" ry="4" fill="${ink}"/>
+        <circle cx="57.5" cy="61" r="1.5" fill="white" opacity="0.9"/>
+        <circle cx="85.5" cy="61" r="1.5" fill="white" opacity="0.9"/>
+        <path d="M62 75 Q70 78 78 75" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+      shy:`
+        <path d="M51 58 Q57 54 63 58" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M77 58 Q83 54 89 58" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="57" cy="63" rx="4" ry="3.5" fill="${ink}"/>
+        <ellipse cx="83" cy="63" rx="4" ry="3.5" fill="${ink}"/>
+        <circle cx="58.5" cy="62" r="1.3" fill="white" opacity="0.9"/>
+        <circle cx="84.5" cy="62" r="1.3" fill="white" opacity="0.9"/>
+        <path d="M63 75 Q70 72 77 75" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="48" cy="67" r="5.5" fill="#FF9999" opacity="0.45"/>
+        <circle cx="92" cy="67" r="5.5" fill="#FF9999" opacity="0.45"/>`
     };
-
-    // 들고 있는 아이템
     const items = {
-      laptop: `<rect x="42" y="100" width="56" height="34" rx="3" fill="${d.acc}" opacity="0.9"/><rect x="45" y="103" width="50" height="25" rx="2" fill="${d.bg}" opacity="0.7"/><rect x="36" y="133" width="68" height="5" rx="2" fill="${d.acc}"/><rect x="48" y="108" width="16" height="2" rx="1" fill="${d.acc}" opacity="0.6"/><rect x="48" y="113" width="28" height="2" rx="1" fill="${d.acc}" opacity="0.6"/><rect x="48" y="118" width="22" height="2" rx="1" fill="${d.acc}" opacity="0.6"/>`,
-      wrench: `<rect x="62" y="95" width="16" height="40" rx="4" fill="${d.acc}"/><rect x="58" y="95" width="24" height="10" rx="3" fill="${d.acc}"/><rect x="60" y="128" width="20" height="10" rx="3" fill="${d.acc}" opacity="0.7"/>`,
-      spark: `<polygon points="70,88 76,108 92,108 79,119 84,139 70,128 56,139 61,119 48,108 64,108" fill="${d.acc}"/>`,
-      megaphone: `<path d="M50,105 L50,130 L62,130 L62,118 L80,130 L80,105 Z" fill="${d.acc}"/><ellipse cx="83" cy="117" rx="6" ry="13" fill="${d.acc}" opacity="0.7"/><path d="M47,112 Q42,117 47,122" stroke="${d.acc}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-      magnifier: `<circle cx="66" cy="112" r="16" fill="none" stroke="${d.acc}" stroke-width="5"/><line x1="77" y1="123" x2="90" y2="136" stroke="${d.acc}" stroke-width="6" stroke-linecap="round"/><circle cx="66" cy="112" r="9" fill="${d.acc}" opacity="0.2"/>`,
-      coffee: `<rect x="55" y="100" width="30" height="32" rx="4" fill="${d.acc}"/><path d="M85,110 Q95,110 95,118 Q95,126 85,126" stroke="${d.acc}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M62,92 Q64,85 62,80" stroke="${d.acc}" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M70,90 Q72,83 70,78" stroke="${d.acc}" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>`,
-      blueprint: `<rect x="44" y="96" width="52" height="40" rx="2" fill="${d.acc}" opacity="0.15"/><rect x="44" y="96" width="52" height="40" rx="2" fill="none" stroke="${d.acc}" stroke-width="2"/><line x1="44" y1="108" x2="96" y2="108" stroke="${d.acc}" stroke-width="1.5"/><line x1="60" y1="108" x2="60" y2="136" stroke="${d.acc}" stroke-width="1.5"/><circle cx="52" cy="120" r="3" fill="${d.acc}"/><circle cx="78" cy="116" r="3" fill="${d.acc}"/><line x1="52" y1="120" x2="78" y2="116" stroke="${d.acc}" stroke-width="1.5"/>`,
-      moon: `<path d="M76,95 Q55,105 58,122 Q61,139 80,139 Q64,132 66,118 Q68,104 76,95 Z" fill="${d.acc}"/><circle cx="88" cy="102" r="3" fill="${d.acc}" opacity="0.7"/><circle cx="94" cy="115" r="2" fill="${d.acc}" opacity="0.5"/>`,
-      book: `<path d="M46,96 Q56,92 70,96 Q84,92 94,96 L94,132 Q84,128 70,132 Q56,128 46,132 Z" fill="${d.acc}"/><line x1="70" y1="96" x2="70" y2="132" stroke="${d.bg}" stroke-width="2"/><line x1="52" y1="106" x2="66" y2="104" stroke="${d.bg}" stroke-width="1.5" opacity="0.6"/><line x1="52" y1="115" x2="66" y2="113" stroke="${d.bg}" stroke-width="1.5" opacity="0.6"/>`,
-      seedling: `<line x1="70" y1="138" x2="70" y2="110" stroke="${d.acc}" stroke-width="3" stroke-linecap="round"/><ellipse cx="60" cy="104" rx="12" ry="7" fill="${d.acc}" transform="rotate(-25 60 104)"/><ellipse cx="80" cy="100" rx="12" ry="7" fill="${d.acc}" opacity="0.7" transform="rotate(25 80 100)"/>`
+      laptop:`<rect x="40" y="102" width="60" height="36" rx="3" fill="${d.acc}" opacity="0.85"/>
+              <rect x="43" y="105" width="54" height="27" rx="2" fill="${d.bg}"/>
+              <rect x="34" y="137" width="72" height="5" rx="2.5" fill="${d.acc}" opacity="0.7"/>
+              <rect x="47" y="110" width="18" height="2" rx="1" fill="${d.acc}" opacity="0.5"/>
+              <rect x="47" y="115" width="30" height="2" rx="1" fill="${d.acc}" opacity="0.5"/>
+              <rect x="47" y="120" width="24" height="2" rx="1" fill="${d.acc}" opacity="0.5"/>`,
+      wrench:`<rect x="63" y="96" width="14" height="44" rx="5" fill="${d.acc}" opacity="0.85"/>
+              <rect x="57" y="96" width="26" height="12" rx="4" fill="${d.acc}"/>
+              <rect x="59" y="131" width="22" height="12" rx="4" fill="${d.acc}" opacity="0.65"/>`,
+      spark:`<polygon points="70,86 77,110 96,110 80,123 87,147 70,134 53,147 60,123 44,110 63,110" fill="${d.acc}" filter="url(#glow)"/>`,
+      megaphone:`<path d="M48,103 L48,130 L62,130 L62,116 L82,130 L82,103 Z" fill="${d.acc}" opacity="0.85"/>
+                 <ellipse cx="85" cy="116" rx="7" ry="14" fill="${d.acc}" opacity="0.65"/>
+                 <path d="M45,110 Q38,116 45,122" stroke="${d.acc}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
+      magnifier:`<circle cx="64" cy="114" r="18" fill="none" stroke="${d.acc}" stroke-width="5.5"/>
+                 <line x1="76" y1="126" x2="92" y2="142" stroke="${d.acc}" stroke-width="6.5" stroke-linecap="round"/>
+                 <circle cx="64" cy="114" r="10" fill="${d.acc}" opacity="0.15"/>`,
+      coffee:`<rect x="52" y="100" width="36" height="36" rx="6" fill="${d.acc}" opacity="0.85"/>
+              <path d="M88,112 Q100,112 100,122 Q100,132 88,132" stroke="${d.acc}" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M60,91 Q63,83 60,77" stroke="${d.acc}" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+              <path d="M70,89 Q73,81 70,75" stroke="${d.acc}" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>`,
+      blueprint:`<rect x="42" y="97" width="56" height="45" rx="3" fill="${d.acc}" opacity="0.07"/>
+                 <rect x="42" y="97" width="56" height="45" rx="3" fill="none" stroke="${d.acc}" stroke-width="2"/>
+                 <line x1="42" y1="111" x2="98" y2="111" stroke="${d.acc}" stroke-width="1.5"/>
+                 <line x1="62" y1="111" x2="62" y2="142" stroke="${d.acc}" stroke-width="1.5"/>
+                 <circle cx="52" cy="124" r="3.5" fill="${d.acc}"/>
+                 <circle cx="80" cy="120" r="3.5" fill="${d.acc}"/>
+                 <line x1="52" y1="124" x2="80" y2="120" stroke="${d.acc}" stroke-width="1.5"/>`,
+      moon:`<path d="M78,95 Q54,107 58,126 Q62,145 84,145 Q64,136 67,120 Q70,104 78,95 Z" fill="${d.acc}" opacity="0.9"/>
+            <circle cx="91" cy="102" r="3.5" fill="${d.acc}" opacity="0.6"/>
+            <circle cx="98" cy="116" r="2.5" fill="${d.acc}" opacity="0.4"/>`,
+      book:`<path d="M44,97 Q56,92 70,97 Q84,92 96,97 L96,137 Q84,132 70,137 Q56,132 44,137 Z" fill="${d.acc}" opacity="0.85"/>
+            <line x1="70" y1="97" x2="70" y2="137" stroke="${d.bg}" stroke-width="2.5"/>
+            <line x1="50" y1="108" x2="66" y2="106" stroke="${d.bg}" stroke-width="1.5" opacity="0.5"/>
+            <line x1="50" y1="118" x2="66" y2="116" stroke="${d.bg}" stroke-width="1.5" opacity="0.5"/>`,
+      seedling:`<line x1="70" y1="143" x2="70" y2="112" stroke="${d.acc}" stroke-width="3.5" stroke-linecap="round"/>
+               <ellipse cx="58" cy="106" rx="14" ry="8" fill="${d.acc}" opacity="0.85" transform="rotate(-25 58 106)"/>
+               <ellipse cx="82" cy="101" rx="14" ry="8" fill="${d.acc}" opacity="0.65" transform="rotate(25 82 101)"/>`
     };
-
     return `<svg viewBox="0 0 140 200" xmlns="http://www.w3.org/2000/svg">
-      <!-- 배경 원 -->
-      <circle cx="70" cy="80" r="68" fill="${d.bg}"/>
-      <circle cx="70" cy="80" r="65" fill="none" stroke="${d.acc}" stroke-width="1" opacity="0.25"/>
-
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <ellipse cx="70" cy="82" rx="66" ry="68" fill="${d.bg}"/>
+      <ellipse cx="70" cy="82" rx="63" ry="65" fill="none" stroke="${d.acc}" stroke-width="1" opacity="0.2"/>
       <!-- 몸통 -->
-      <path d="M40,115 Q40,100 70,100 Q100,100 100,115 L104,155 Q104,162 70,162 Q36,162 36,155 Z" fill="${d.body}"/>
-
+      <path d="M38,118 Q38,102 70,102 Q102,102 102,118 L106,162 Q106,170 70,170 Q34,170 34,162 Z" fill="${d.body}"/>
       <!-- 목 -->
-      <rect x="61" y="90" width="18" height="14" rx="4" fill="${d.face}"/>
-
+      <rect x="61" y="92" width="18" height="14" rx="4" fill="${d.face}"/>
       <!-- 머리 -->
-      <ellipse cx="70" cy="68" rx="28" ry="30" fill="${d.face}"/>
-
+      <ellipse cx="70" cy="70" rx="30" ry="32" fill="${d.face}"/>
       <!-- 귀 -->
-      <ellipse cx="42" cy="70" rx="5" ry="7" fill="${d.face}"/>
-      <ellipse cx="98" cy="70" rx="5" ry="7" fill="${d.face}"/>
-
+      <ellipse cx="40" cy="72" rx="5.5" ry="8" fill="${d.face}"/>
+      <ellipse cx="100" cy="72" rx="5.5" ry="8" fill="${d.face}"/>
       <!-- 머리카락 -->
-      <ellipse cx="70" cy="40" rx="28" ry="10" fill="${d.body}"/>
-      <rect x="42" y="36" width="56" height="14" rx="4" fill="${d.body}"/>
-
+      <ellipse cx="70" cy="40" rx="30" ry="12" fill="${d.body}"/>
+      <rect x="40" y="37" width="60" height="16" rx="5" fill="${d.body}"/>
       <!-- 표정 -->
-      ${moods[d.mood] || moods.calm}
-
+      ${moods[d.mood]||moods.calm}
       <!-- 팔 -->
-      <path d="M40,115 Q28,125 30,145 Q32,155 42,152" stroke="${d.face}" stroke-width="14" fill="none" stroke-linecap="round"/>
-      <path d="M100,115 Q112,125 110,145 Q108,155 98,152" stroke="${d.face}" stroke-width="14" fill="none" stroke-linecap="round"/>
-
+      <path d="M38,120 Q24,132 27,154 Q29,164 40,160" stroke="${d.face}" stroke-width="15" fill="none" stroke-linecap="round"/>
+      <path d="M102,120 Q116,132 113,154 Q111,164 100,160" stroke="${d.face}" stroke-width="15" fill="none" stroke-linecap="round"/>
       <!-- 아이템 -->
-      ${items[d.item] || items.coffee}
-
-      <!-- 강조 포인트 (배지) -->
-      <circle cx="105" cy="40" r="12" fill="${d.acc}"/>
-      <text x="105" y="44.5" text-anchor="middle" font-size="11" font-weight="bold" fill="${d.bg}" font-family="monospace">${type.slice(0,2)}</text>
+      ${items[d.item]||items.coffee}
+      <!-- 유형 배지 -->
+      <circle cx="108" cy="38" r="14" fill="${d.acc}" opacity="0.95"/>
+      <circle cx="108" cy="38" r="14" fill="none" stroke="white" stroke-width="1" opacity="0.3"/>
+      <text x="108" y="43" text-anchor="middle" font-size="10" font-weight="700" fill="${d.bg}" font-family="monospace">${type.slice(0,2)}</text>
     </svg>`;
   }
 
-  // ============ 16 TYPES (v3: leader 필드 추가, EC 조합 설명 강화) ============
+  // ── TYPES ──
   const types = {
-    'EMST': {
-      name: '1인 프로덕트 빌더',
-      tagline: '말로 앱을 만들고, 만든 것으로 일을 바꾸는 사람',
-      desc: '당신은 <strong>AI 시대의 전형적인 탑승자</strong>입니다. 구경하지 않고 실행하며, 쓰기만 하지 않고 만듭니다. 구조화된 방식으로 도구를 설계하고, 그 도구를 팀에 전파합니다. 자동화, AI 워크플로우 설계, 바이브 코딩이 자연스럽게 당신의 언어가 됩니다.',
-      traits: { strength: '실행 + 제작 + 체계 + 전파', weakness: '번아웃 주의', tool: 'Cursor · Claude Code', moment: '금요일 밤, 새 툴 릴리즈' },
-      next: { label: 'Next Level', title: '만든 것을 조직 자산으로', desc: '개인 도구를 팀 표준 워크플로우로 확장해보세요. 당신이 만든 것이 조직 전체의 생산성으로 번지는 순간, 영향력의 차원이 달라집니다.' },
-      leader: '팀의 첫 AI 실험을 설계하는 역할이 딱 맞습니다. 당신이 직접 만들기보다, 만드는 환경을 팀 전체에 만들어주는 것이 지금 가장 큰 레버리지입니다.'
-    },
-    'EMSP': {
-      name: '조용한 메이커',
-      tagline: '혼자서 도구를 빚는 장인형',
-      desc: '당신은 <strong>실행력과 제작 역량을 겸비한 메이커</strong>입니다. 구조화된 방식으로 도구를 쌓고, 직접 만든 결과물로 자신의 업무를 매끄럽게 흘러가게 합니다. 다만 그 결과물을 주변에 드러내는 데는 조심스럽습니다.',
-      traits: { strength: '완성도 · 깊이', weakness: '영향력 확산', tool: 'VS Code · Notion', moment: '늦은 밤, 혼자 디버깅' },
-      next: { label: 'Next Level', title: '만든 것을 한 번만 보여주기', desc: '만들고 있는 도구 중 하나를 간단한 내부 데모로 공유해보세요. 확산이 본격화되면 영향력이 전혀 다른 차원으로 올라섭니다.' },
-      leader: '팀 내 AI 도구 표준을 설계하는 역할에 강점이 있습니다. 혼자 만들던 것을 팀 프로세스로 패키징하는 것, 그게 지금 당신에게 필요한 한 걸음입니다.'
-    },
-    'EMIT': {
-      name: '직관형 스프린터',
-      tagline: '떠오르면 바로 만들고, 바로 공유하는 사람',
-      desc: '당신은 <strong>속도가 무기인 실행형 메이커</strong>입니다. 완벽한 설계보다 일단 만들고 고치는 방식으로 움직이며, 만든 것을 바로 동료들에게 던져봅니다. AI 시대의 "일단 해보자" 정신을 가장 잘 체화한 타입입니다.',
-      traits: { strength: '속도 · 추진력', weakness: '재사용성', tool: 'v0 · Lovable · Bolt', moment: '아이디어 → 5분 후 프로토타입' },
-      next: { label: 'Next Level', title: '재현 가능한 구조 만들기', desc: '빠른 실행력에 체계화 습관이 더해지면, 당신의 작업은 "즉흥 결과물"에서 "재사용 가능한 자산"이 됩니다.' },
-      leader: '팀에서 첫 번째로 시도하고 사례를 만드는 역할이 딱 어울립니다. 단, 팀원들이 따라올 수 있도록 속도를 조금 낮추고 "어떻게 만들었는지"를 함께 공유해보세요.'
-    },
-    'EMIP': {
-      name: '직관형 장인',
-      tagline: '즉흥적으로 만들어서, 조용히 잘 쓰는 사람',
-      desc: '당신은 <strong>감각으로 도구를 빚는 타입</strong>입니다. 체계적으로 설계하진 않지만, 필요할 때 즉흥적으로 만들어내는 능력이 있습니다. 만든 것을 요란하게 드러내진 않지만 자신의 업무에 잘 녹여냅니다.',
-      traits: { strength: '순발력 · 감각', weakness: '문서화', tool: 'ChatGPT · Claude', moment: '필요할 때 즉석에서' },
-      next: { label: 'Next Level', title: '"감"을 "문서"로 바꾸기', desc: '즉흥적으로 만드는 흐름을 짧게라도 기록해보세요. 감각이 자산이 되고, 자산이 공유 가능해집니다.' },
-      leader: '팀원들이 "어디서부터 시작해야 할지 모를 때" 롤모델이 되어줄 수 있습니다. 당신의 즉흥적인 시도 과정을 가끔 공개적으로 보여주는 것만으로도 팀의 심리적 장벽이 낮아집니다.'
-    },
-    'ECST': {
-      name: '파워 유저 에반젤리스트',
-      tagline: 'AI를 가장 잘 다루며 팀을 이끄는 사람',
-      desc: '당신은 <strong>AI 툴의 최전선에 서 있는 전파자</strong>입니다. 새 도구를 빠르게 파악하고, 정교하게 활용하며, 팀에 적극적으로 전파합니다. 직접 코드를 짜지 않아도 AI를 "도구"가 아니라 "업무 언어"로 쓰는 수준입니다. 이 유형이 팀 AI 전환의 실질적인 촉매가 됩니다.',
-      traits: { strength: '활용 깊이 · 전파력', weakness: '제작 경험 부재', tool: 'ChatGPT Pro · Perplexity · Claude', moment: '팀 슬랙에 실전 팁 공유' },
-      next: { label: 'Bridge to Maker', title: '"잘 쓰는 사람"에서 "만드는 사람"으로', desc: '이미 AI를 누구보다 잘 쓰고 있습니다. 다음은 그 활용을 반복 가능한 도구로 포장하는 것입니다. 가장 자주 쓰는 프롬프트 하나를 자동화해보세요.' },
-      leader: '팀 AI 전환의 실질적인 촉매 역할입니다. 당신의 사례가 팀원들에게 "나도 할 수 있겠다"는 신호를 줍니다. AI 활용 가이드라인이나 팀 내 베스트 프랙티스를 정리하는 것부터 시작해보세요.'
-    },
-    'ECSP': {
-      name: '정밀형 파워유저',
-      tagline: '혼자서 AI를 가장 깊고 정확하게 다루는 사람',
-      desc: '당신은 <strong>AI 활용을 정교하게 설계하는 개인 플레이어</strong>입니다. 도구를 직접 만들기보다 활용의 깊이를 추구하며, 체계적으로 프롬프트와 워크플로우를 다듬습니다. AI를 "잘 쓰는 것"이 이미 하나의 역량이 된 사람입니다.',
-      traits: { strength: '활용 정밀도 · 체계성', weakness: '팀 공유 부족', tool: 'Claude · Notion AI · 프롬프트 라이브러리', moment: '정교한 프롬프트가 원하는 결과를 낼 때' },
-      next: { label: 'Bridge to Maker', title: '활용 노하우를 팀 자산으로', desc: '체계적으로 쌓은 프롬프트와 워크플로우를 팀에 공유해보세요. 혼자 잘 쓰는 것과 조직이 잘 쓰는 것, 그 차이를 만드는 사람이 될 수 있습니다.' },
-      leader: '팀의 AI 활용 기준과 품질을 높이는 역할입니다. 당신이 정리한 활용 패턴을 팀 가이드라인으로 만들면, 조직 전체의 AI 리터러시가 올라갑니다.'
-    },
-    'ECIT': {
-      name: '감각파 확산자',
-      tagline: '쓰면서 퍼뜨리는, 팀의 AI 입문 가이드',
-      desc: '당신은 <strong>직관적으로 AI를 쓰고, 열정적으로 퍼뜨리는 타입</strong>입니다. 정교하게 설계하진 않아도 실전 감각으로 필요한 답을 잘 뽑아내고, 그 경험을 동료들과 자연스럽게 나눕니다. 팀의 AI 온보딩을 움직이는 사람입니다.',
-      traits: { strength: '공감 · 전파력', weakness: '깊이 있는 활용', tool: 'ChatGPT · Gemini', moment: '점심시간, 동료에게 툴 추천' },
-      next: { label: 'Bridge to Maker', title: '공유 스토리에 "만든 것" 하나 더하기', desc: '당신의 설득력은 실전 사례에서 나옵니다. 간단한 자동화 결과물 하나를 레퍼토리에 추가하면 영향력이 배가됩니다.' },
-      leader: '팀의 AI 온보딩을 이끌기에 가장 적합한 성향입니다. 팀 내 AI 첫 경험을 설계하는 워크숍이나 스터디를 주도해보세요. 당신의 자연스러운 공유 방식이 팀의 심리적 장벽을 가장 빠르게 낮춥니다.'
-    },
-    'ECIP': {
-      name: '일상형 애용자',
-      tagline: '조용히, 그러나 꾸준히 AI와 일하는 사람',
-      desc: '당신은 <strong>AI를 부담 없이 업무에 녹여 쓰는 실용주의자</strong>입니다. 요란하진 않지만 매일 AI와 대화하며 일합니다. 직접 만들거나 정교하게 설계하지는 않지만, 이미 AI 없이 일하는 건 어색한 단계에 와 있습니다.',
-      traits: { strength: '꾸준함 · 실용성', weakness: '확장 시도 부족', tool: 'ChatGPT · Claude', moment: '보고서 초안 요청할 때' },
-      next: { label: 'Bridge to Maker', title: '가장 귀찮은 업무 하나 자동화하기', desc: '매일 반복하는 작업 중 가장 귀찮은 것 하나를 골라보세요. 그 하나만 자동화해도 당신의 하루는 크게 바뀝니다.' },
-      leader: '팀원들에게 "AI가 어렵지 않다"는 것을 몸소 보여줄 수 있는 사람입니다. 당신이 일상적으로 AI를 쓰는 모습이, 망설이는 팀원들에게 가장 현실적인 롤모델이 됩니다.'
-    },
-    'OMST': {
-      name: '신중한 아키텍트',
-      tagline: '충분히 이해한 뒤 견고하게 만드는 사람',
-      desc: '당신은 <strong>관찰과 제작의 균형을 아는 설계자형</strong>입니다. 바로 뛰어들기보다 흐름을 파악한 뒤, 구조를 갖춰 만듭니다. 만들면 팀에 체계적으로 공유하며, 결과물의 재사용성이 높습니다.',
-      traits: { strength: '설계 역량', weakness: '실행 속도', tool: '설계 문서 + 코드', moment: '긴 리서치 끝의 한 방' },
-      next: { label: 'Next Level', title: '관찰 → 실행의 간격 줄이기', desc: '설계력은 이미 뛰어납니다. "완벽히 이해한 뒤"가 아니라 "이해하면서" 만드는 속도가 필요할 때입니다.' },
-      leader: '팀 AI 전환의 로드맵을 설계하는 역할에 강점이 있습니다. 단기 실험과 장기 구조화를 함께 설계하면서, 팀이 산만하게 흩어지지 않도록 방향을 잡아주는 포지션입니다.'
-    },
-    'OMSP': {
-      name: '관찰파 메이커',
-      tagline: '조용히 분석하고, 조용히 만드는 사람',
-      desc: '당신은 <strong>독립적으로 깊이 탐구하는 개인 메이커</strong>입니다. 트렌드를 관찰하고, 체계적으로 설계해서 자기만의 도구를 만듭니다. 공유는 조심스럽지만 결과물의 완성도는 높은 편입니다.',
-      traits: { strength: '탐구 · 완성도', weakness: '외부 노출', tool: '개인 GitHub · Obsidian', moment: '주말, 개인 프로젝트' },
-      next: { label: 'Next Level', title: '결과물 한 줄 공유부터', desc: '"이런 거 만들어봤어요" 한 줄이면 충분합니다. 공유는 당신의 제작 속도도 빠르게 합니다.' },
-      leader: '팀이 AI를 무분별하게 쓰지 않도록 품질 기준을 세우는 역할입니다. 당신의 신중함이 팀의 AI 활용을 빠르게 가되 올바르게 가도록 잡아주는 앵커가 됩니다.'
-    },
-    'OMIT': {
-      name: '번뜩이는 확산자',
-      tagline: '느낌 오면 만들어서 바로 퍼뜨리는 사람',
-      desc: '당신은 <strong>관찰에서 제작, 확산까지 한 번에 움직이는 타입</strong>입니다. 구조화보다는 감각에 의지하지만, 만든 것을 숨기지 않고 적극적으로 나눕니다. 팀 안에서 "뭔가 계속 만드는 사람"으로 인식됩니다.',
-      traits: { strength: '감각 + 확산', weakness: '일관성', tool: '다양하게 갈아탐', moment: '영감 오면 즉시' },
-      next: { label: 'Next Level', title: '반복을 체계로 바꾸기', desc: '즉흥적으로 만든 것을 라이브러리로 정리해보세요. 감각에 체계가 더해지면 당신의 영향력은 훨씬 멀리 갑니다.' },
-      leader: '팀의 아이디어 엔진 역할입니다. 다만 당신의 번뜩임이 팀에 "피로감"이 아닌 "에너지"가 되려면, 실험의 결과를 간단히 정리해서 공유하는 루틴이 필요합니다.'
-    },
-    'OMIP': {
-      name: '은둔형 빌더',
-      tagline: '조용히 관찰하고, 조용히 만들고, 혼자 잘 쓰는 사람',
-      desc: '당신은 <strong>자기만의 세계에서 도구를 빚는 타입</strong>입니다. 외부 노출은 최소화하지만, 내부에서는 계속 뭔가를 만듭니다. AI 시대의 "조용한 수혜자"입니다.',
-      traits: { strength: '독립성 · 몰입', weakness: '가시성', tool: '자기만의 스택', moment: '아무도 모르는 시간' },
-      next: { label: 'Next Level', title: '세미나 한 번만 공개 발표', desc: '만든 것이 충분히 쌓여 있을 가능성이 높습니다. 아주 작은 내부 세미나 한 번이면, 당신의 존재감은 완전히 달라집니다.' },
-      leader: '팀에게 가장 필요한 것은 당신이 만든 것을 "한 번 보여주는 것"입니다. 리더로서 당신의 역할은 조용히 방향을 제시하는 것 — 화려한 발표보다 신뢰를 쌓는 꾸준함이 강점입니다.'
-    },
-    'OCST': {
-      name: '체계적인 학습자',
-      tagline: '신중하게 배우고, 팀에 정확하게 전하는 사람',
-      desc: '당신은 <strong>충분히 공부한 뒤 정확하게 쓰는 타입</strong>입니다. 성급하게 실행하지 않고, 체계적으로 정보를 소화합니다. 팀 공유에도 적극적이어서 교육자·가이드 포지션이 잘 어울립니다.',
-      traits: { strength: '지식 · 공유력', weakness: '첫 실행', tool: 'Notion · 북마크', moment: '강의 → 정리된 노트' },
-      next: { label: 'Bridge to Executor', title: '"배움"에서 "실험"으로', desc: '이미 알고 있는 것이 많습니다. 이번 주 안에 만들어볼 것 하나만 정해보세요.' },
-      leader: '팀 AI 교육 프로그램을 설계하고 운영하는 역할에 가장 잘 맞습니다. 당신이 쌓은 지식을 체계적인 온보딩 커리큘럼으로 만들면, 팀 전체의 AI 전환 속도가 달라집니다.'
-    },
-    'OCSP': {
-      name: '정독형 사색가',
-      tagline: '깊이 읽고, 깊이 생각하는 사람',
-      desc: '당신은 <strong>AI의 흐름을 누구보다 잘 이해하는 관찰자</strong>입니다. 체계적으로 정보를 소화하고, 개인적으로 조용히 활용합니다. 이해도는 높지만, 행동 전환이 다소 느립니다.',
-      traits: { strength: '통찰 · 분석', weakness: '실행 지연', tool: '아티클 · 페이퍼', moment: '주말, 긴 글 읽기' },
-      next: { label: 'Bridge to Executor', title: '읽은 것 중 하나만 써보기', desc: '오늘 본 아티클에서 언급된 도구 중 하나를 지금 열어보세요. 이해가 경험이 되는 순간, 완전히 다른 레벨이 됩니다.' },
-      leader: '팀의 AI 도입 결정에 "왜"와 "어떻게"를 제공하는 역할입니다. 당신의 통찰로 팀이 트렌드에 휩쓸리지 않고 방향 있는 선택을 할 수 있도록 도와주세요.'
-    },
-    'OCIT': {
-      name: '친화형 커뮤니케이터',
-      tagline: '편하게 듣고, 편하게 나누는 사람',
-      desc: '당신은 <strong>AI 이야기를 자연스럽게 주고받는 사교형</strong>입니다. 깊이 파고들진 않지만, 주변과 정보를 잘 교류하며 동료들의 AI 접근성을 높입니다. 팀의 분위기 메이커입니다.',
-      traits: { strength: '소통 · 연결', weakness: '깊이', tool: '카톡 · 슬랙 공유', moment: '커피챗에서 팁 교환' },
-      next: { label: 'Bridge to Executor', title: '대화를 실습으로', desc: '대화에서 들은 팁 하나를 바로 써보는 습관을 만들어보세요. 커뮤니케이션에 실행이 더해지면 당신은 팀의 핵심 허브가 됩니다.' },
-      leader: 'AI 전환 과정에서 팀의 저항을 낮추고 분위기를 만드는 역할입니다. 심리적 안전감을 만드는 것이 기술 도입보다 먼저인 경우가 많습니다. 당신이 그 역할을 잘 할 수 있습니다.'
-    },
-    'OCIP': {
-      name: '관조형 입문자',
-      tagline: '천천히, 그러나 분명히 다가서는 사람',
-      desc: '당신은 <strong>지금 막 AI 시대의 문턱에 서 있는 관찰자</strong>입니다. 아직 깊이 뛰어들진 않았지만, 흐름을 외면하지도 않습니다. 오히려 <strong>가장 큰 성장 가능성</strong>을 가진 위치입니다. AI에 거리감이 있어도 괜찮습니다. 시작하지 않은 사람만이 가진 "첫 시작의 특권"이 있습니다.',
-      traits: { strength: '성장 여백', weakness: '첫 한 걸음', tool: '아직 없음 (그게 자연스러워요)', moment: '오늘 이 세미나' },
-      next: { label: 'First Step', title: '오늘, 한 번 써보기', desc: '복잡한 건 필요 없습니다. 오늘 당장 AI에게 업무 메일 한 통만 초안을 부탁해보세요. 그 한 번이 모든 것의 시작입니다.' },
-      leader: '팀에서 AI를 가장 조심스러워하는 구성원의 입장을 가장 잘 이해하는 사람입니다. 그 이해가 오히려 팀 전환을 이끄는 데 강점이 됩니다. "나도 처음엔 몰랐다"는 리더의 말이 팀을 가장 많이 움직입니다.'
-    }
+    'EMST':{name:'1인 프로덕트 빌더',tagline:'말로 앱을 만들고, 만든 것으로 일을 바꾸는 사람',desc:'당신은 <strong>AI 시대의 전형적인 탑승자</strong>입니다. 구경하지 않고 실행하며, 쓰기만 하지 않고 만듭니다. 구조화된 방식으로 도구를 설계하고, 그 도구를 팀에 전파합니다. 자동화, AI 워크플로우 설계, 바이브 코딩이 자연스럽게 당신의 언어가 됩니다.',traits:{strength:'실행 + 제작 + 체계 + 전파',weakness:'번아웃 주의',tool:'Cursor · Claude Code',moment:'금요일 밤, 새 툴 릴리즈'},next:{label:'Next Level',title:'만든 것을 조직 자산으로',desc:'개인 도구를 팀 표준 워크플로우로 확장해보세요. 당신이 만든 것이 조직 전체의 생산성으로 번지는 순간, 영향력의 차원이 달라집니다.'},leader:'팀의 첫 AI 실험을 설계하는 역할이 딱 맞습니다. 당신이 직접 만들기보다, 만드는 환경을 팀 전체에 만들어주는 것이 지금 가장 큰 레버리지입니다.'},
+    'EMSP':{name:'조용한 메이커',tagline:'혼자서 도구를 빚는 장인형',desc:'당신은 <strong>실행력과 제작 역량을 겸비한 메이커</strong>입니다. 구조화된 방식으로 도구를 쌓고, 직접 만든 결과물로 자신의 업무를 매끄럽게 흘러가게 합니다. 다만 그 결과물을 주변에 드러내는 데는 조심스럽습니다.',traits:{strength:'완성도 · 깊이',weakness:'영향력 확산',tool:'VS Code · Notion',moment:'늦은 밤, 혼자 디버깅'},next:{label:'Next Level',title:'만든 것을 한 번만 보여주기',desc:'만들고 있는 도구 중 하나를 간단한 내부 데모로 공유해보세요. 확산이 본격화되면 영향력이 전혀 다른 차원으로 올라섭니다.'},leader:'팀 내 AI 도구 표준을 설계하는 역할에 강점이 있습니다. 혼자 만들던 것을 팀 프로세스로 패키징하는 것, 그게 지금 당신에게 필요한 한 걸음입니다.'},
+    'EMIT':{name:'직관형 스프린터',tagline:'떠오르면 바로 만들고, 바로 공유하는 사람',desc:'당신은 <strong>속도가 무기인 실행형 메이커</strong>입니다. 완벽한 설계보다 일단 만들고 고치는 방식으로 움직이며, 만든 것을 바로 동료들에게 던져봅니다. AI 시대의 "일단 해보자" 정신을 가장 잘 체화한 타입입니다.',traits:{strength:'속도 · 추진력',weakness:'재사용성',tool:'v0 · Lovable · Bolt',moment:'아이디어 → 5분 후 프로토타입'},next:{label:'Next Level',title:'재현 가능한 구조 만들기',desc:'빠른 실행력에 체계화 습관이 더해지면, 당신의 작업은 "즉흥 결과물"에서 "재사용 가능한 자산"이 됩니다.'},leader:'팀에서 첫 번째로 시도하고 사례를 만드는 역할이 딱 어울립니다. 단, 팀원들이 따라올 수 있도록 속도를 조금 낮추고 "어떻게 만들었는지"를 함께 공유해보세요.'},
+    'EMIP':{name:'직관형 장인',tagline:'즉흥적으로 만들어서, 조용히 잘 쓰는 사람',desc:'당신은 <strong>감각으로 도구를 빚는 타입</strong>입니다. 체계적으로 설계하진 않지만, 필요할 때 즉흥적으로 만들어내는 능력이 있습니다. 만든 것을 요란하게 드러내진 않지만 자신의 업무에 잘 녹여냅니다.',traits:{strength:'순발력 · 감각',weakness:'문서화',tool:'ChatGPT · Claude',moment:'필요할 때 즉석에서'},next:{label:'Next Level',title:'"감"을 "문서"로 바꾸기',desc:'즉흥적으로 만드는 흐름을 짧게라도 기록해보세요. 감각이 자산이 되고, 자산이 공유 가능해집니다.'},leader:'팀원들이 "어디서부터 시작해야 할지 모를 때" 롤모델이 되어줄 수 있습니다. 당신의 즉흥적인 시도 과정을 가끔 공개적으로 보여주는 것만으로도 팀의 심리적 장벽이 낮아집니다.'},
+    'ECST':{name:'파워 유저 에반젤리스트',tagline:'AI를 가장 잘 다루며 팀을 이끄는 사람',desc:'당신은 <strong>AI 툴의 최전선에 서 있는 전파자</strong>입니다. 새 도구를 빠르게 파악하고, 정교하게 활용하며, 팀에 적극적으로 전파합니다. 직접 코드를 짜지 않아도 AI를 "도구"가 아니라 "업무 언어"로 쓰는 수준입니다.',traits:{strength:'활용 깊이 · 전파력',weakness:'제작 경험 부재',tool:'ChatGPT Pro · Perplexity · Claude',moment:'팀 슬랙에 실전 팁 공유'},next:{label:'Bridge to Maker',title:'"잘 쓰는 사람"에서 "만드는 사람"으로',desc:'이미 AI를 누구보다 잘 쓰고 있습니다. 다음은 그 활용을 반복 가능한 도구로 포장하는 것입니다.'},leader:'팀 AI 전환의 실질적인 촉매 역할입니다. AI 활용 가이드라인이나 팀 내 베스트 프랙티스를 정리하는 것부터 시작해보세요.'},
+    'ECSP':{name:'정밀형 파워유저',tagline:'혼자서 AI를 가장 깊고 정확하게 다루는 사람',desc:'당신은 <strong>AI 활용을 정교하게 설계하는 개인 플레이어</strong>입니다. 도구를 직접 만들기보다 활용의 깊이를 추구하며, 체계적으로 프롬프트와 워크플로우를 다듬습니다.',traits:{strength:'활용 정밀도 · 체계성',weakness:'팀 공유 부족',tool:'Claude · Notion AI · 프롬프트 라이브러리',moment:'정교한 프롬프트가 원하는 결과를 낼 때'},next:{label:'Bridge to Maker',title:'활용 노하우를 팀 자산으로',desc:'체계적으로 쌓은 프롬프트와 워크플로우를 팀에 공유해보세요. 혼자 잘 쓰는 것과 조직이 잘 쓰는 것, 그 차이를 만드는 사람이 될 수 있습니다.'},leader:'팀의 AI 활용 기준과 품질을 높이는 역할입니다. 당신이 정리한 활용 패턴을 팀 가이드라인으로 만들면, 조직 전체의 AI 리터러시가 올라갑니다.'},
+    'ECIT':{name:'감각파 확산자',tagline:'쓰면서 퍼뜨리는, 팀의 AI 입문 가이드',desc:'당신은 <strong>직관적으로 AI를 쓰고, 열정적으로 퍼뜨리는 타입</strong>입니다. 정교하게 설계하진 않아도 실전 감각으로 필요한 답을 잘 뽑아내고, 그 경험을 동료들과 자연스럽게 나눕니다.',traits:{strength:'공감 · 전파력',weakness:'깊이 있는 활용',tool:'ChatGPT · Gemini',moment:'점심시간, 동료에게 툴 추천'},next:{label:'Bridge to Maker',title:'공유 스토리에 "만든 것" 하나 더하기',desc:'당신의 설득력은 실전 사례에서 나옵니다. 간단한 자동화 결과물 하나를 레퍼토리에 추가하면 영향력이 배가됩니다.'},leader:'팀 내 AI 온보딩을 이끌기에 가장 적합한 성향입니다. 당신의 자연스러운 공유 방식이 팀의 심리적 장벽을 가장 빠르게 낮춥니다.'},
+    'ECIP':{name:'일상형 애용자',tagline:'조용히, 그러나 꾸준히 AI와 일하는 사람',desc:'당신은 <strong>AI를 부담 없이 업무에 녹여 쓰는 실용주의자</strong>입니다. 요란하진 않지만 매일 AI와 대화하며 일합니다.',traits:{strength:'꾸준함 · 실용성',weakness:'확장 시도 부족',tool:'ChatGPT · Claude',moment:'보고서 초안 요청할 때'},next:{label:'Bridge to Maker',title:'가장 귀찮은 업무 하나 자동화하기',desc:'매일 반복하는 작업 중 가장 귀찮은 것 하나를 골라보세요. 그 하나만 자동화해도 당신의 하루는 크게 바뀝니다.'},leader:'팀원들에게 "AI가 어렵지 않다"는 것을 몸소 보여줄 수 있는 사람입니다. 당신이 일상적으로 AI를 쓰는 모습이 망설이는 팀원들에게 가장 현실적인 롤모델이 됩니다.'},
+    'OMST':{name:'신중한 아키텍트',tagline:'충분히 이해한 뒤 견고하게 만드는 사람',desc:'당신은 <strong>관찰과 제작의 균형을 아는 설계자형</strong>입니다. 바로 뛰어들기보다 흐름을 파악한 뒤, 구조를 갖춰 만듭니다. 만들면 팀에 체계적으로 공유하며, 결과물의 재사용성이 높습니다.',traits:{strength:'설계 역량',weakness:'실행 속도',tool:'설계 문서 + 코드',moment:'긴 리서치 끝의 한 방'},next:{label:'Next Level',title:'관찰 → 실행의 간격 줄이기',desc:'설계력은 이미 뛰어납니다. "완벽히 이해한 뒤"가 아니라 "이해하면서" 만드는 속도가 필요할 때입니다.'},leader:'팀 AI 전환의 로드맵을 설계하는 역할에 강점이 있습니다. 단기 실험과 장기 구조화를 함께 설계하면서, 팀이 산만하게 흩어지지 않도록 방향을 잡아주는 포지션입니다.'},
+    'OMSP':{name:'관찰파 메이커',tagline:'조용히 분석하고, 조용히 만드는 사람',desc:'당신은 <strong>독립적으로 깊이 탐구하는 개인 메이커</strong>입니다. 트렌드를 관찰하고, 체계적으로 설계해서 자기만의 도구를 만듭니다.',traits:{strength:'탐구 · 완성도',weakness:'외부 노출',tool:'개인 GitHub · Obsidian',moment:'주말, 개인 프로젝트'},next:{label:'Next Level',title:'결과물 한 줄 공유부터',desc:'"이런 거 만들어봤어요" 한 줄이면 충분합니다. 공유는 당신의 제작 속도도 빠르게 합니다.'},leader:'팀이 AI를 무분별하게 쓰지 않도록 품질 기준을 세우는 역할입니다. 당신의 신중함이 팀의 AI 활용을 빠르게 가되 올바르게 가도록 잡아주는 앵커가 됩니다.'},
+    'OMIT':{name:'번뜩이는 확산자',tagline:'느낌 오면 만들어서 바로 퍼뜨리는 사람',desc:'당신은 <strong>관찰에서 제작, 확산까지 한 번에 움직이는 타입</strong>입니다. 구조화보다는 감각에 의지하지만, 만든 것을 숨기지 않고 적극적으로 나눕니다.',traits:{strength:'감각 + 확산',weakness:'일관성',tool:'다양하게 갈아탐',moment:'영감 오면 즉시'},next:{label:'Next Level',title:'반복을 체계로 바꾸기',desc:'즉흥적으로 만든 것을 라이브러리로 정리해보세요. 감각에 체계가 더해지면 당신의 영향력은 훨씬 멀리 갑니다.'},leader:'팀의 아이디어 엔진 역할입니다. 당신의 번뜩임이 팀에 에너지가 되려면, 실험의 결과를 간단히 정리해서 공유하는 루틴이 필요합니다.'},
+    'OMIP':{name:'은둔형 빌더',tagline:'조용히 관찰하고, 조용히 만들고, 혼자 잘 쓰는 사람',desc:'당신은 <strong>자기만의 세계에서 도구를 빚는 타입</strong>입니다. 외부 노출은 최소화하지만, 내부에서는 계속 뭔가를 만듭니다. AI 시대의 "조용한 수혜자"입니다.',traits:{strength:'독립성 · 몰입',weakness:'가시성',tool:'자기만의 스택',moment:'아무도 모르는 시간'},next:{label:'Next Level',title:'세미나 한 번만 공개 발표',desc:'만든 것이 충분히 쌓여 있을 가능성이 높습니다. 아주 작은 내부 세미나 한 번이면, 당신의 존재감은 완전히 달라집니다.'},leader:'팀에게 가장 필요한 것은 당신이 만든 것을 "한 번 보여주는 것"입니다. 리더로서 당신의 역할은 조용히 방향을 제시하는 것 — 화려한 발표보다 신뢰를 쌓는 꾸준함이 강점입니다.'},
+    'OCST':{name:'체계적인 학습자',tagline:'신중하게 배우고, 팀에 정확하게 전하는 사람',desc:'당신은 <strong>충분히 공부한 뒤 정확하게 쓰는 타입</strong>입니다. 성급하게 실행하지 않고, 체계적으로 정보를 소화합니다. 팀 공유에도 적극적이어서 교육자·가이드 포지션이 잘 어울립니다.',traits:{strength:'지식 · 공유력',weakness:'첫 실행',tool:'Notion · 북마크',moment:'강의 → 정리된 노트'},next:{label:'Bridge to Executor',title:'"배움"에서 "실험"으로',desc:'이미 알고 있는 것이 많습니다. 이번 주 안에 만들어볼 것 하나만 정해보세요.'},leader:'팀 AI 교육 프로그램을 설계하고 운영하는 역할에 가장 잘 맞습니다. 체계적인 온보딩 커리큘럼으로 만들면, 팀 전체의 AI 전환 속도가 달라집니다.'},
+    'OCSP':{name:'정독형 사색가',tagline:'깊이 읽고, 깊이 생각하는 사람',desc:'당신은 <strong>AI의 흐름을 누구보다 잘 이해하는 관찰자</strong>입니다. 체계적으로 정보를 소화하고, 개인적으로 조용히 활용합니다. 이해도는 높지만, 행동 전환이 다소 느립니다.',traits:{strength:'통찰 · 분석',weakness:'실행 지연',tool:'아티클 · 페이퍼',moment:'주말, 긴 글 읽기'},next:{label:'Bridge to Executor',title:'읽은 것 중 하나만 써보기',desc:'오늘 본 아티클에서 언급된 도구 중 하나를 지금 열어보세요. 이해가 경험이 되는 순간, 완전히 다른 레벨이 됩니다.'},leader:'팀의 AI 도입 결정에 "왜"와 "어떻게"를 제공하는 역할입니다. 당신의 통찰로 팀이 트렌드에 휩쓸리지 않고 방향 있는 선택을 할 수 있도록 도와주세요.'},
+    'OCIT':{name:'친화형 커뮤니케이터',tagline:'편하게 듣고, 편하게 나누는 사람',desc:'당신은 <strong>AI 이야기를 자연스럽게 주고받는 사교형</strong>입니다. 깊이 파고들진 않지만, 주변과 정보를 잘 교류하며 동료들의 AI 접근성을 높입니다.',traits:{strength:'소통 · 연결',weakness:'깊이',tool:'카톡 · 슬랙 공유',moment:'커피챗에서 팁 교환'},next:{label:'Bridge to Executor',title:'대화를 실습으로',desc:'대화에서 들은 팁 하나를 바로 써보는 습관을 만들어보세요. 커뮤니케이션에 실행이 더해지면 당신은 팀의 핵심 허브가 됩니다.'},leader:'AI 전환 과정에서 팀의 저항을 낮추고 분위기를 만드는 역할입니다. 심리적 안전감을 만드는 것이 기술 도입보다 먼저인 경우가 많습니다.'},
+    'OCIP':{name:'관조형 입문자',tagline:'천천히, 그러나 분명히 다가서는 사람',desc:'당신은 <strong>지금 막 AI 시대의 문턱에 서 있는 관찰자</strong>입니다. 아직 깊이 뛰어들진 않았지만, 흐름을 외면하지도 않습니다. 오히려 <strong>가장 큰 성장 가능성</strong>을 가진 위치입니다. 시작하지 않은 사람만이 가진 "첫 시작의 특권"이 있습니다.',traits:{strength:'성장 여백',weakness:'첫 한 걸음',tool:'아직 없음 (그게 자연스러워요)',moment:'오늘 이 세미나'},next:{label:'First Step',title:'오늘, 한 번 써보기',desc:'복잡한 건 필요 없습니다. 오늘 당장 AI에게 업무 메일 한 통만 초안을 부탁해보세요. 그 한 번이 모든 것의 시작입니다.'},leader:'팀에서 AI를 가장 조심스러워하는 구성원의 입장을 가장 잘 이해하는 사람입니다. "나도 처음엔 몰랐다"는 리더의 말이 팀을 가장 많이 움직입니다.'}
   };
 
-  // ============ STATE ============
+  // ── STATE ──
   let currentQ = 0;
-  let answers = { O: 0, E: 0, C: 0, M: 0, I: 0, S: 0, P: 0, T: 0, N: 0 };
+  let answers = {O:0,E:0,C:0,M:0,I:0,S:0,P:0,T:0,N:0};
+  let myType = '';
+  // 이전으로 돌아가기 위한 히스토리 [{score, axis, shuffledOptions}]
+  let answerHistory = [];
+  let currentSelection = null; // 현재 문항에서 선택한 {score, axis, btn}
 
-  // ============ FUNCTIONS ============
-  function startTest() {
-    document.getElementById('intro').classList.remove('active');
-    document.getElementById('questions').classList.add('active');
-    currentQ = 0;
-    answers = { O: 0, E: 0, C: 0, M: 0, I: 0, S: 0, P: 0, T: 0, N: 0 };
-    renderQuestion();
-    window.scrollTo(0, 0);
-  }
-
+  // ── UTILS ──
   function shuffle(arr) {
     const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+    for (let i = a.length-1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
     }
     return a;
   }
 
-  function renderQuestion() {
+  // ── FLOW ──
+  function startTest() {
+    currentQ = 0;
+    answers = {O:0,E:0,C:0,M:0,I:0,S:0,P:0,T:0,N:0};
+    answerHistory = [];
+    currentSelection = null;
+    document.getElementById('intro').classList.remove('active');
+    document.getElementById('questions').classList.add('active');
+    renderQ();
+    window.scrollTo(0,0);
+  }
+
+  function renderQ(savedOptions) {
     const q = questions[currentQ];
-    document.getElementById('qCurrent').textContent = currentQ + 1;
-    document.getElementById('progressFill').style.width = `${((currentQ) / questions.length) * 100}%`;
+    currentSelection = null;
+
+    document.getElementById('qNum').textContent = currentQ + 1;
+    document.getElementById('qBar').style.width = `${(currentQ / questions.length) * 100}%`;
     document.getElementById('qTag').textContent = q.tag;
     document.getElementById('qText').textContent = q.text;
 
-    const optsEl = document.getElementById('options');
-    optsEl.innerHTML = '';
-    // 선택지 순서 랜덤 셔플 (매 문항마다)
-    const shuffled = shuffle(q.options);
-    shuffled.forEach((opt, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'option' + (opt.score === 'N' ? ' neutral' : '');
-      btn.innerHTML = `
-        <span class="option-num">${String(i + 1).padStart(2, '0')}</span>
-        <span class="option-text">${opt.text}</span>
-      `;
-      btn.onclick = () => selectOption(opt.score, q.axis, btn);
-      optsEl.appendChild(btn);
-    });
+    // 이전 버튼: 첫 문항이면 비활성
+    const backBtn = document.getElementById('qBackBtn');
+    backBtn.disabled = currentQ === 0;
 
-    const card = document.getElementById('questionCard');
-    card.style.animation = 'none';
-    card.offsetHeight;
-    card.style.animation = 'fadeUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
-  }
+    // 다음 버튼: 선택 전엔 비활성
+    const nextBtn = document.getElementById('qNextBtn');
+    nextBtn.disabled = true;
 
-  function selectOption(score, axis, btn) {
-    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-    btn.classList.add('selected');
-
-    // N 응답은 해당 축의 "더 수동적인 쪽"으로 가중
-    // OE 축: N → O (관찰), CM: N → C (소비), IS: N → I (직관/비체계), PT: N → P (개인)
-    if (score === 'N') {
-      answers.N++;
-      if (axis === 'OE') answers.O += 0.5;
-      else if (axis === 'CM') answers.C += 0.5;
-      else if (axis === 'IS') answers.I += 0.5;
-      else if (axis === 'PT') answers.P += 0.5;
-    } else {
-      answers[score]++;
+    // 선택지 렌더 (savedOptions: 이전으로 돌아올 때 순서 복원)
+    const opts = savedOptions || shuffle(q.options);
+    // 현재 문항의 셔플된 순서 저장 (이전 버튼 눌렀을 때 복원용)
+    if (!savedOptions) {
+      // history에 셔플 순서 임시 저장 (실제 기록은 goNext에서)
+      q._shuffled = opts;
     }
 
-    setTimeout(() => {
-      currentQ++;
-      if (currentQ < questions.length) {
-        renderQuestion();
-      } else {
-        document.getElementById('progressFill').style.width = '100%';
-        setTimeout(showResult, 300);
-      }
-    }, 320);
+    const wrap = document.getElementById('qOptions');
+    wrap.innerHTML = '';
+    opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'q-opt';
+      btn.innerHTML = `<span class="q-opt-num">${String(i+1).padStart(2,'0')}</span><span>${opt.text}</span>`;
+      btn.onclick = () => selectOpt(opt.score, q.axis, btn);
+      wrap.appendChild(btn);
+    });
+
+    // 이전에서 돌아온 경우 → 저장된 선택 복원 (하이라이트만, 점수는 이미 취소됨)
+    if (savedOptions && answerHistory[currentQ]?.selectedScore) {
+      const prevScore = answerHistory[currentQ].selectedScore;
+      const prevText = answerHistory[currentQ].selectedText;
+      wrap.querySelectorAll('.q-opt').forEach(btn => {
+        if (btn.querySelector('span:last-child').textContent === prevText) {
+          btn.classList.add('selected');
+          currentSelection = { score: prevScore, axis: q.axis };
+          nextBtn.disabled = false;
+        }
+      });
+    }
+
+    // 카드 재애니메이션
+    const card = document.getElementById('qCard');
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'screenIn 0.35s cubic-bezier(0.16,1,0.3,1)';
+  }
+
+  function selectOpt(score, axis, btn) {
+    document.querySelectorAll('.q-opt').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentSelection = {
+      score, axis,
+      text: btn.querySelector('span:last-child').textContent
+    };
+    document.getElementById('qNextBtn').disabled = false;
+  }
+
+  function applyScore(score, axis) {
+    if (score === 'N') {
+      answers.N++;
+      if (axis==='OE') answers.O+=0.5;
+      else if (axis==='CM') answers.C+=0.5;
+      else if (axis==='IS') answers.I+=0.5;
+      else if (axis==='PT') answers.P+=0.5;
+    } else { answers[score]++; }
+  }
+
+  function undoScore(score, axis) {
+    if (score === 'N') {
+      answers.N--;
+      if (axis==='OE') answers.O-=0.5;
+      else if (axis==='CM') answers.C-=0.5;
+      else if (axis==='IS') answers.I-=0.5;
+      else if (axis==='PT') answers.P-=0.5;
+    } else { answers[score]--; }
+  }
+
+  function goNext() {
+    if (!currentSelection) return;
+    const q = questions[currentQ];
+
+    // history에 이 문항 답변 기록
+    answerHistory[currentQ] = {
+      score: currentSelection.score,
+      axis: currentSelection.axis,
+      selectedScore: currentSelection.score,
+      selectedText: currentSelection.text,
+      shuffledOptions: q._shuffled || questions[currentQ].options
+    };
+
+    // 점수 반영
+    applyScore(currentSelection.score, currentSelection.axis);
+    currentSelection = null;
+
+    currentQ++;
+    if (currentQ < questions.length) {
+      renderQ();
+    } else {
+      document.getElementById('qBar').style.width = '100%';
+      setTimeout(showResult, 350);
+    }
+  }
+
+  function goBack() {
+    if (currentQ === 0) return;
+    currentQ--;
+
+    // 이전 문항의 점수 취소
+    const prev = answerHistory[currentQ];
+    if (prev) undoScore(prev.score, prev.axis);
+
+    // 이전 문항 복원 (셔플 순서 유지)
+    renderQ(prev?.shuffledOptions);
+    window.scrollTo(0, 0);
   }
 
   function computeType() {
-    // 동점일 경우 N 응답이 많으면 수동형(O/C/I/P) 우선
-    const oe = answers.O >= answers.E ? 'O' : 'E';
-    const cm = answers.C >= answers.M ? 'C' : 'M';
-    const is_ = answers.I >= answers.S ? 'I' : 'S';
-    const pt = answers.P >= answers.T ? 'P' : 'T';
-    return oe + cm + is_ + pt;
+    return (answers.O>=answers.E?'O':'E') +
+           (answers.C>=answers.M?'C':'M') +
+           (answers.I>=answers.S?'I':'S') +
+           (answers.P>=answers.T?'P':'T');
   }
 
   function showResult() {
-    const type = computeType();
-    const info = types[type];
+    myType = computeType();
+    const info = types[myType];
 
     document.getElementById('questions').classList.remove('active');
     document.getElementById('result').classList.add('active');
 
-    // 캐릭터 비주얼
-    document.getElementById('characterVisual').innerHTML = renderCharacter(type);
-
-    document.getElementById('resultCode').textContent = type;
+    // 히어로
+    document.getElementById('resultChar').innerHTML = buildChar(myType);
+    document.getElementById('resultCode').textContent = myType;
     document.getElementById('resultName').textContent = info.name;
     document.getElementById('resultTagline').textContent = info.tagline;
+
+    // 칩
+    const chipMap = {O:'관찰자',E:'실행자',C:'소비형',M:'제작형',I:'직관형',S:'체계형',P:'개인형',T:'확산형'};
+    document.getElementById('resultChips').innerHTML =
+      myType.split('').map((l,i)=>
+        `<span class="chip${i===0?' primary':''}">${l} · ${chipMap[l]}</span>`
+      ).join('');
+
+    // 설명
     document.getElementById('resultDesc').innerHTML = info.desc;
-    document.getElementById('nextStepLabel').textContent = info.next.label;
-    document.getElementById('nextStepTitle').textContent = info.next.title;
-    document.getElementById('nextStepDesc').textContent = info.next.desc;
+
+    // 트레이트
+    document.getElementById('traitGrid').innerHTML = `
+      <div class="trait-cell"><span class="trait-cell-label">💪 강점</span><div class="trait-cell-val">${info.traits.strength}</div></div>
+      <div class="trait-cell"><span class="trait-cell-label">⚠️ 약한 지점</span><div class="trait-cell-val">${info.traits.weakness}</div></div>
+      <div class="trait-cell"><span class="trait-cell-label">🛠 주로 쓰는 도구</span><div class="trait-cell-val">${info.traits.tool}</div></div>
+      <div class="trait-cell"><span class="trait-cell-label">✨ 빛나는 순간</span><div class="trait-cell-val">${info.traits.moment}</div></div>`;
+
+    // 축 바
+    const axesDef = [
+      {left:'관망형',leftSub:'Observer',right:'탐색형',rightSub:'Executor',lk:'O',rk:'E'},
+      {left:'소비형',leftSub:'Consumer',right:'제작형',rightSub:'Maker',lk:'C',rk:'M'},
+      {left:'직관형',leftSub:'Intuitive',right:'체계형',rightSub:'Systematic',lk:'I',rk:'S'},
+      {left:'개인형',leftSub:'Personal',right:'전파형',rightSub:'Transmitter',lk:'P',rk:'T'}
+    ];
+    document.getElementById('axisBars').innerHTML = axesDef.map(a => {
+      const lc=answers[a.lk], rc=answers[a.rk], tot=lc+rc||1;
+      const la=lc>=rc, pct=Math.round(((la?lc:rc)/tot)*100);
+      return `<div class="abar">
+        <div class="abar-labels">
+          <span class="${la?'active':''}"><b>${a.left}</b> <em>${a.leftSub}</em> · ${lc.toFixed(1).replace('.0','')}</span>
+          <span class="${!la?'active':''}"><em>${a.rightSub}</em> <b>${a.right}</b> · ${rc.toFixed(1).replace('.0','')}</span>
+        </div>
+        <div class="abar-track">
+          <div class="abar-fill" style="width:0%;${la?'left:0':'right:0'}" data-w="${pct}%"></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    setTimeout(()=>{
+      document.querySelectorAll('.abar-fill').forEach(el=>{el.style.width=el.dataset.w;});
+    }, 100);
+
+    // Next Step
+    document.getElementById('nextLabel').textContent = info.next.label;
+    document.getElementById('nextTitle').textContent = info.next.title;
+    document.getElementById('nextDesc').textContent = info.next.desc;
+
+    // 리더
     document.getElementById('leaderText').textContent = info.leader;
 
-    // 스탯 칩 (4글자 각각을 해석해서 칩으로)
-    const chipMap = {
-      'O': '관찰자', 'E': '실행자',
-      'C': '소비형', 'M': '제작형',
-      'I': '직관형', 'S': '체계형',
-      'P': '개인형', 'T': '확산형'
-    };
-    const chipsEl = document.getElementById('statChips');
-    chipsEl.innerHTML = '';
-    type.split('').forEach((letter, idx) => {
-      const chip = document.createElement('span');
-      chip.className = 'stat-chip' + (idx === 0 ? ' primary' : '');
-      chip.textContent = `${letter} · ${chipMap[letter]}`;
-      chipsEl.appendChild(chip);
-    });
+    // 갤러리
+    renderGallery(myType);
 
-    // 트레이트 그리드
-    const traitsEl = document.getElementById('traitGrid');
-    traitsEl.innerHTML = `
-      <div class="trait-item">
-        <div class="trait-label">💪 강점</div>
-        <div class="trait-value">${info.traits.strength}</div>
-      </div>
-      <div class="trait-item">
-        <div class="trait-label">⚠️ 약한 지점</div>
-        <div class="trait-value">${info.traits.weakness}</div>
-      </div>
-      <div class="trait-item">
-        <div class="trait-label">🛠 주로 쓰는 도구</div>
-        <div class="trait-value">${info.traits.tool}</div>
-      </div>
-      <div class="trait-item">
-        <div class="trait-label">✨ 당신이 빛나는 순간</div>
-        <div class="trait-value">${info.traits.moment}</div>
-      </div>
-    `;
-
-    // 축 분포 바
-    const axes = [
-      { left: 'Observer', right: 'Executor', leftKey: 'O', rightKey: 'E' },
-      { left: 'Consumer', right: 'Maker', leftKey: 'C', rightKey: 'M' },
-      { left: 'Intuitive', right: 'Systematic', leftKey: 'I', rightKey: 'S' },
-      { left: 'Personal', right: 'Transmitter', leftKey: 'P', rightKey: 'T' }
-    ];
-
-    const barsEl = document.getElementById('axisBars');
-    barsEl.innerHTML = '';
-    axes.forEach(a => {
-      const leftCount = answers[a.leftKey];
-      const rightCount = answers[a.rightKey];
-      const total = leftCount + rightCount || 1;
-      const leftPct = (leftCount / total) * 100;
-      const rightPct = (rightCount / total) * 100;
-      const leftActive = leftCount >= rightCount;
-
-      const bar = document.createElement('div');
-      bar.className = 'axis-bar';
-      bar.innerHTML = `
-        <div class="axis-bar-labels">
-          <span class="axis-bar-label ${leftActive ? 'active' : ''}">${a.left} · ${leftCount.toFixed(1).replace('.0','')}</span>
-          <span class="axis-bar-label ${!leftActive ? 'active' : ''}">${a.right} · ${rightCount.toFixed(1).replace('.0','')}</span>
-        </div>
-        <div class="axis-bar-track">
-          <div class="axis-bar-fill" style="width: ${leftActive ? leftPct : rightPct}%; ${leftActive ? 'left: 0;' : 'right: 0;'}"></div>
-        </div>
-      `;
-      barsEl.appendChild(bar);
-    });
-
-    window.scrollTo(0, 0);
-
-    // ── 통계: 내 결과 저장 후 전체 분포 로드
-    saveAndLoadStats(type);
+    window.scrollTo(0,0);
+    saveAndLoadStats(myType);
   }
 
-  // ============ STORAGE + STATS ============
+  // ── FIREBASE STATS ──
+  // ▼ Firebase Realtime Database URL을 여기 입력하세요
+  const FIREBASE_URL = 'https://YOUR-PROJECT-ID-default-rtdb.asia-southeast1.firebasedatabase.app';
+  const DB_PATH = '/clab_ai_survey_counts';
   const ALL_TYPES = ['EMST','EMSP','EMIT','EMIP','ECST','ECSP','ECIT','ECIP',
                      'OMST','OMSP','OMIT','OMIP','OCST','OCSP','OCIT','OCIP'];
 
-  // ============ STORAGE + STATS (Firebase Realtime DB) ============
-  // ▼ 아래 URL을 본인의 Firebase Realtime Database URL로 교체하세요
-  const FIREBASE_URL = 'https://ai-type-7c6de-default-rtdb.asia-southeast1.firebasedatabase.app';
-  const DB_PATH = '/clab_ai_survey_counts';
-
-  async function saveAndLoadStats(myType) {
+  async function saveAndLoadStats(type) {
     try {
-      // 1) Firebase에서 현재 카운트 읽기 (REST GET)
       const getRes = await fetch(`${FIREBASE_URL}${DB_PATH}.json`);
       let counts = await getRes.json();
       if (!counts || typeof counts !== 'object') counts = {};
-
-      // 2) 내 유형 +1
-      counts[myType] = (counts[myType] || 0) + 1;
-
-      // 3) Firebase에 저장 (REST PUT — 전체 덮어쓰기)
-      await fetch(`${FIREBASE_URL}${DB_PATH}.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      counts[type] = (counts[type]||0)+1;
+      await fetch(`${FIREBASE_URL}${DB_PATH}.json`,{
+        method:'PUT', headers:{'Content-Type':'application/json'},
         body: JSON.stringify(counts)
       });
-
-      // 4) 차트 렌더링
-      renderStats(counts, myType);
+      renderStats(counts, type);
     } catch(e) {
-      // 네트워크 오류 등 → 1명으로 fallback
-      console.warn('Firebase 연결 실패:', e);
-      renderStats({ [myType]: 1 }, myType);
+      renderStats({[type]:1}, type);
     }
   }
 
-  function renderStats(counts, myType) {
+  function renderStats(counts, myT) {
     document.getElementById('statsLoading').style.display = 'none';
     document.getElementById('statsContent').style.display = 'block';
-
-    const total = Object.values(counts).reduce((a, b) => a + b, 0);
-    const myCount = counts[myType] || 1;
-
-    // 내 위치 요약
-    const sorted = ALL_TYPES.slice().sort((a,b) => (counts[b]||0) - (counts[a]||0));
-    const myRank = sorted.indexOf(myType) + 1;
-    const myPct = total > 0 ? Math.round((myCount / total) * 100) : 0;
+    const total = Object.values(counts).reduce((a,b)=>a+b,0);
+    const myCnt = counts[myT]||1;
+    const sorted = ALL_TYPES.slice().sort((a,b)=>(counts[b]||0)-(counts[a]||0));
+    const rank = sorted.indexOf(myT)+1;
+    const pct = total>0?Math.round((myCnt/total)*100):0;
     document.getElementById('statsMyRank').innerHTML =
-      `전체 <strong>${total.toLocaleString()}명</strong> 참여 중 · 당신의 유형(<strong>${myType}</strong>)은 ` +
-      `<strong>${myPct}%</strong> · ${myRank}위에 해당합니다.`;
-
-    // 막대 차트 — 상위 8개 표시
-    const topTypes = sorted.slice(0, 8);
-    const maxCount = (counts[topTypes[0]] || 1);
-    const barsEl = document.getElementById('statsBars');
-    barsEl.innerHTML = '';
-
-    topTypes.forEach(t => {
-      const cnt = counts[t] || 0;
-      const pct = Math.round((cnt / maxCount) * 100);
-      const isMe = t === myType;
-      const row = document.createElement('div');
-      row.className = 'stats-bar-row' + (isMe ? ' is-me' : '');
-      row.innerHTML = `
-        <span class="stats-type-label">${t}${isMe ? ' ★' : ''}</span>
-        <div class="stats-bar-track">
-          <div class="stats-bar-fill" style="width:0%" data-target="${pct}%"></div>
-        </div>
-        <span class="stats-bar-count">${cnt}</span>`;
-      barsEl.appendChild(row);
-    });
-
-    // 애니메이션
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        barsEl.querySelectorAll('.stats-bar-fill').forEach(el => {
-          el.style.width = el.dataset.target;
-        });
-      });
-    });
+      `전체 <strong>${total.toLocaleString()}명</strong> 참여 · <strong>${myT}</strong>은 <strong>${pct}%</strong> (${rank}위)`;
+    const maxC = counts[sorted[0]]||1;
+    const top8 = sorted.slice(0,8);
+    document.getElementById('statsBars').innerHTML = top8.map(t=>{
+      const cnt=counts[t]||0;
+      const w=Math.round((cnt/maxC)*100);
+      const isMe=t===myT;
+      return `<div class="stats-bar-row${isMe?' is-me':''}">
+        <span class="stats-type-label">${t}${isMe?' ★':''}</span>
+        <div class="stats-bar-track"><div class="stats-bar-fill" style="width:0%" data-w="${w}%"></div></div>
+        <span class="stats-bar-count">${cnt}</span>
+      </div>`;
+    }).join('');
+    setTimeout(()=>{
+      document.querySelectorAll('.stats-bar-fill').forEach(el=>{el.style.width=el.dataset.w;});
+    },150);
   }
 
+  // ── 갤러리 렌더링 ──
+  const ALL_TYPES_ORDER = [
+    'EMST','EMSP','EMIT','EMIP',
+    'ECST','ECSP','ECIT','ECIP',
+    'OMST','OMSP','OMIT','OMIP',
+    'OCST','OCSP','OCIT','OCIP'
+  ];
+
+  function renderGallery(myT) {
+    const grid = document.getElementById('galleryGrid');
+    grid.innerHTML = ALL_TYPES_ORDER.map(t => {
+      const isMe = t === myT;
+      const name = types[t].name;
+      return `<div class="gallery-item${isMe?' is-me':''}" onclick="openCharModal('${t}')">
+        ${isMe ? '<div class="gallery-item-me-badge">★</div>' : ''}
+        <div class="gallery-item-char">${buildChar(t)}</div>
+        <span class="gallery-item-code">${t}</span>
+        <span class="gallery-item-name">${name}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── 캐릭터 상세 모달 ──
+  function openCharModal(type) {
+    const info = types[type];
+    document.getElementById('charModalChar').innerHTML = buildChar(type);
+    document.getElementById('charModalCode').textContent = type;
+    document.getElementById('charModalName').textContent = info.name;
+    document.getElementById('charModalTagline').textContent = info.tagline;
+    document.getElementById('charModalDesc').innerHTML = info.desc;
+    document.getElementById('charModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCharModal() {
+    document.getElementById('charModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── 공유 카드 모달 ──
+  // ════════════════════════════════════
+  // 공유 시스템 — Canvas 이미지 생성 + navigator.share
+  // ════════════════════════════════════
+
+  let shareBlob = null; // 생성된 이미지 Blob 캐시
+
+  function openShareModal() {
+    shareBlob = null;
+    document.getElementById('shareModalSub').textContent = '카드 이미지를 만들고 있어요…';
+    document.getElementById('shareBtns').style.display = 'none';
+    document.getElementById('shareCanvasLoading').classList.remove('hidden');
+    document.getElementById('shareModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // 모바일 여부로 버튼 레이블 결정
+    const canNativeShare = !!(navigator.share && navigator.canShare);
+    document.getElementById('sharePrimaryLabel').textContent =
+      canNativeShare ? '카카오톡 · 인스타 등으로 공유' : '이미지 공유하기';
+
+    // 약간 딜레이 후 Canvas 생성 (모달 애니메이션 완료 후)
+    setTimeout(() => drawShareCard(), 200);
+  }
+
+  function closeShareModal() {
+    document.getElementById('shareModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── Canvas로 공유 카드 이미지 그리기 ──
+  async function drawShareCard() {
+    const canvas = document.getElementById('shareCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = 600, H = 800;
+    canvas.width = W; canvas.height = H;
+
+    const info = types[myType];
+    const cd = charData[myType] || charData['OCIP'];
+
+    // ── 배경 ──
+    ctx.fillStyle = '#080C14';
+    ctx.fillRect(0, 0, W, H);
+
+    // 격자 패턴
+    ctx.strokeStyle = 'rgba(0,229,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 32) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 32) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // 상단 글로우 라인
+    const topGlow = ctx.createLinearGradient(0,0,W,0);
+    topGlow.addColorStop(0,'transparent');
+    topGlow.addColorStop(0.5,'#00E5FF');
+    topGlow.addColorStop(1,'transparent');
+    ctx.fillStyle = topGlow;
+    ctx.fillRect(0, 0, W, 2);
+
+    // 배경 방사형 글로우
+    const grd = ctx.createRadialGradient(W*0.2, H*0.15, 0, W*0.2, H*0.15, W*0.6);
+    grd.addColorStop(0, 'rgba(0,229,255,0.07)');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── 시리즈 레이블 ──
+    ctx.font = '500 22px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.letterSpacing = '4px';
+    ctx.textAlign = 'center';
+    ctx.fillText('AI PERSONALITY TYPE · C-LAB', W/2, 64);
+
+    // ── 캐릭터 SVG → Canvas ──
+    try {
+      const svgStr = buildChar(myType);
+      const svgBlob = new Blob([svgStr], {type:'image/svg+xml'});
+      const url = URL.createObjectURL(svgBlob);
+      await new Promise((res, rej) => {
+        const img = new Image();
+        img.onload = () => {
+          const cw = 260, ch = 340;
+          const cx = (W - cw) / 2, cy = 90;
+          // 캐릭터 글로우
+          ctx.save();
+          ctx.shadowColor = '#00E5FF';
+          ctx.shadowBlur = 40;
+          ctx.drawImage(img, cx, cy, cw, ch);
+          ctx.restore();
+          URL.revokeObjectURL(url);
+          res();
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); res(); };
+        img.src = url;
+      });
+    } catch(e) {}
+
+    // ── 유형 코드 ──
+    ctx.save();
+    ctx.font = 'bold 88px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    const codeGrad = ctx.createLinearGradient(W/2-160, 0, W/2+160, 0);
+    codeGrad.addColorStop(0, '#00E5FF');
+    codeGrad.addColorStop(0.5, '#FFFFFF');
+    codeGrad.addColorStop(1, '#00B8D4');
+    ctx.fillStyle = codeGrad;
+    ctx.shadowColor = '#00E5FF';
+    ctx.shadowBlur = 28;
+    ctx.fillText(myType, W/2, 490);
+    ctx.restore();
+
+    // ── 유형명 ──
+    ctx.font = 'bold 40px "Black Han Sans", sans-serif';
+    ctx.fillStyle = '#E8EDF5';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'transparent';
+    ctx.fillText(info.name, W/2, 546);
+
+    // ── 태그라인 (줄바꿈 처리) ──
+    ctx.font = '300 24px "Noto Sans KR", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    const tagWords = info.tagline;
+    // 30자 넘으면 2줄 처리
+    if (tagWords.length > 26) {
+      const mid = Math.ceil(tagWords.length / 2);
+      const space = tagWords.lastIndexOf(' ', mid) > 10 ? tagWords.lastIndexOf(' ', mid) : mid;
+      ctx.fillText(tagWords.slice(0, space), W/2, 590);
+      ctx.fillText(tagWords.slice(space).trim(), W/2, 620);
+    } else {
+      ctx.fillText(tagWords, W/2, 596);
+    }
+
+    // ── 구분선 ──
+    const divGrad = ctx.createLinearGradient(80, 0, W-80, 0);
+    divGrad.addColorStop(0, 'transparent');
+    divGrad.addColorStop(0.5, 'rgba(0,229,255,0.25)');
+    divGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = divGrad;
+    ctx.fillRect(80, 658, W-160, 1);
+
+    // ── URL + CTA ──
+    ctx.font = '500 22px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#00E5FF';
+    ctx.textAlign = 'center';
+    ctx.fillText('ai-type.netlify.app', W/2, 706);
+
+    ctx.font = '300 20px "Noto Sans KR", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText('나도 내 AI 직업 유형 알아보기 →', W/2, 740);
+
+    // ── 하단 모서리 장식 ──
+    const cornerSize = 28;
+    ctx.strokeStyle = 'rgba(0,229,255,0.3)';
+    ctx.lineWidth = 2;
+    // 좌하단
+    ctx.beginPath(); ctx.moveTo(24, H-24-cornerSize); ctx.lineTo(24, H-24); ctx.lineTo(24+cornerSize, H-24); ctx.stroke();
+    // 우하단
+    ctx.beginPath(); ctx.moveTo(W-24, H-24-cornerSize); ctx.lineTo(W-24, H-24); ctx.lineTo(W-24-cornerSize, H-24); ctx.stroke();
+    // 좌상단
+    ctx.beginPath(); ctx.moveTo(24, 24+cornerSize); ctx.lineTo(24, 24); ctx.lineTo(24+cornerSize, 24); ctx.stroke();
+    // 우상단
+    ctx.beginPath(); ctx.moveTo(W-24, 24+cornerSize); ctx.lineTo(W-24, 24); ctx.lineTo(W-24-cornerSize, 24); ctx.stroke();
+
+    // ── Blob 생성 ──
+    canvas.toBlob(blob => {
+      shareBlob = blob;
+      document.getElementById('shareCanvasLoading').classList.add('hidden');
+      document.getElementById('shareBtns').style.display = 'flex';
+      document.getElementById('shareModalSub').textContent = '카드가 완성됐어요 ✦';
+    }, 'image/png');
+  }
+
+  // ── 기기 공유 시트 (카카오톡·인스타 등) ──
+  async function doShare() {
+    if (!shareBlob) return;
+    const info = types[myType];
+    const file = new File([shareBlob], `AI-type-${myType}.png`, { type: 'image/png' });
+    const shareData = {
+      title: `나의 AI 직업 유형: ${myType} · ${info.name}`,
+      text: `"${info.tagline}"\n\n나도 해보기 → https://ai-type.netlify.app`,
+      files: [file]
+    };
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else if (navigator.share) {
+        // 파일 공유 미지원 → 텍스트만 공유
+        await navigator.share({ title: shareData.title, text: shareData.text });
+      } else {
+        doDownload();
+      }
+    } catch(e) {
+      if (e.name !== 'AbortError') doDownload();
+    }
+  }
+
+  // ── 이미지 저장 ──
+  function doDownload() {
+    if (!shareBlob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(shareBlob);
+    a.download = `AI-type-${myType}.png`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ── 링크 복사 ──
+  function doCopyLink() {
+    const info = types[myType];
+    const text = `나의 AI 직업 유형: ${myType} · ${info.name}\n"${info.tagline}"\n\n나도 해보기 → https://ai-type.netlify.app`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyLinkLabel');
+      btn.textContent = '복사 완료 ✓';
+      setTimeout(() => { btn.textContent = '링크 복사'; }, 2200);
+    }).catch(() => alert(text));
+  }
+
+  // ── SHARE & RESTART ──
   function restart() {
     document.getElementById('result').classList.remove('active');
     document.getElementById('intro').classList.add('active');
-    window.scrollTo(0, 0);
+    window.scrollTo(0,0);
   }
 
   function shareResult() {
-    const type = computeType();
-    const info = types[type];
-    const text = `나의 AI 성향: ${type} · ${info.name}\n"${info.tagline}"\n\n— C-Lab AI Seminar`;
-
-    if (navigator.share) {
-      navigator.share({ title: 'AI 성향 진단', text: text }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('결과가 복사되었습니다');
-      }).catch(() => { alert(text); });
-    }
+    openShareModal();
   }
 </script>
-
 </body>
 </html>
